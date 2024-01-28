@@ -212,3 +212,12 @@ redis-server /etc/redis/redis.conf
 docker
 ```
 
+## 7、Docker 容器自启动
+
+```bash
+# MySQL 容器自启动
+docker update mysql --restart=always
+# Redis 容器自启动
+docker update redis --restart=always
+```
+
