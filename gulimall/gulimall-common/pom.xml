@@ -12,7 +12,21 @@
     <artifactId>gulimall-common</artifactId>
     <description>每一个微服务公共的依赖、bean、工具类等</description>
 
+    <properties>
+        <java.version>1.8</java.version>
+        <spring-boot.version>2.2.2.RELEASE</spring-boot.version>
+        <spring-cloud.version>Hoxton.SR1</spring-cloud.version>
+        <spring-cloud-alibaba.version>2.1.0.RELEASE</spring-cloud-alibaba.version>
+    </properties>
+
     <dependencies>
+        <!--<dependency>-->
+        <!--    &lt;!&ndash; 继承了ribbon&ndash;&gt;-->
+        <!--    <groupId>org.springframework.cloud</groupId>-->
+        <!--    <artifactId>spring-cloud-starter-openfeign</artifactId>-->
+        <!--    <version>${spring-cloud-alibaba.version}</version>-->
+        <!--</dependency>-->
+
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
@@ -21,12 +35,12 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
+            <version>1.18.8</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpcore</artifactId>
-            <version>4.4.12</version>
+            <version>4.4.13</version>
         </dependency>
         <dependency>
             <groupId>commons-lang</groupId>
@@ -48,4 +62,30 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 </project>
