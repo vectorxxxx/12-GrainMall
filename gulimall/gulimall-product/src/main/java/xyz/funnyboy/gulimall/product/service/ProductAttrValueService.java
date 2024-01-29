@@ -13,7 +13,8 @@ import java.util.Map;
  * @email sunlightcs@gmail.com
  * @date 2024-01-28 20:52:38
  */
-public interface ProductAttrValueService extends IService<ProductAttrValueEntity> {
+public interface ProductAttrValueService extends IService<ProductAttrValueEntity>
+{
 
     PageUtils queryPage(Map<String, Object> params);
 }

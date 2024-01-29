@@ -13,7 +13,8 @@ import java.util.Map;
  * @email sunlightcs@gmail.com
  * @date 2024-01-28 20:52:38
  */
-public interface SpuCommentService extends IService<SpuCommentEntity> {
+public interface SpuCommentService extends IService<SpuCommentEntity>
+{
 
     PageUtils queryPage(Map<String, Object> params);
 }

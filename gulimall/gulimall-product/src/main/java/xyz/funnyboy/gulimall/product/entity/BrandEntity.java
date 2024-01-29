@@ -2,21 +2,21 @@ package xyz.funnyboy.gulimall.product.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
-import lombok.Data;
 
 /**
  * 品牌
- * 
+ *
  * @author chenshun
  * @email sunlightcs@gmail.com
  * @date 2024-01-28 20:52:38
  */
 @Data
 @TableName("pms_brand")
-public class BrandEntity implements Serializable {
+public class BrandEntity implements Serializable
+{
 	private static final long serialVersionUID = 1L;
 
 	/**
