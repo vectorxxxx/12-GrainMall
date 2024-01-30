@@ -19,7 +19,7 @@ import java.util.Map;
  * @date 2024-01-28 21:22:07
  */
 @RestController
-@RequestMapping("/api/product/category")
+@RequestMapping("/product/category")
 public class CategoryController
 {
     @Autowired
@@ -30,7 +30,7 @@ public class CategoryController
         List<CategoryEntity> categoryEntityList = categoryService.listWithTree();
         return R
                 .ok()
-                .put("data", categoryEntityList);
+                .put("menus", categoryEntityList);
     }
 
     /**
@@ -51,7 +51,7 @@ public class CategoryController
     /**
      * 信息
      */
-    @RequestMapping("/info/{catId}")
+    @GetMapping("/info/{catId}")
     // @RequiresPermissions("product:category:info")
     public R info(
             @PathVariable("catId")
@@ -66,7 +66,7 @@ public class CategoryController
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     // @RequiresPermissions("product:category:save")
     public R save(
             @RequestBody
@@ -79,7 +79,7 @@ public class CategoryController
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PutMapping("/update")
     // @RequiresPermissions("product:category:update")
     public R update(
             @RequestBody
@@ -90,9 +90,26 @@ public class CategoryController
     }
 
     /**
+     * 更新排序
+     *
+     * @param menus 菜单
+     * @return {@link R}
+     */
+    @PutMapping("/update/sort")
+    public R updateSort(
+            @RequestBody
+                    CategoryEntity[] menus) {
+        for (CategoryEntity menu : menus) {
+            System.out.println(menu);
+        }
+        categoryService.updateBatchById(Arrays.asList(menus));
+        return R.ok();
+    }
+
+    /**
      * 删除
      */
-    @RequestMapping("/delete")
+    @DeleteMapping("/delete")
     // @RequiresPermissions("product:category:delete")
     public R delete(
             @RequestBody

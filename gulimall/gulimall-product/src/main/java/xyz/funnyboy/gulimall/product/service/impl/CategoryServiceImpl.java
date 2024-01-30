@@ -38,8 +38,20 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                 .stream()
                 .filter(menu -> menu.getParentCid() == 0)
                 .peek(menu -> menu.setChildren(this.getChildren(menu, categoryEntityList)))
-                .sorted(Comparator.comparingInt(CategoryEntity::getSort))
+                .sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ?
+                                                         0 :
+                                                         menu.getSort())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 按 ID 删除菜单
+     *
+     * @param ids IDS
+     */
+    @Override
+    public void removeMenuByIds(List<Long> ids) {
+        baseMapper.deleteBatchIds(ids);
     }
 
     private List<CategoryEntity> getChildren(CategoryEntity parent, List<CategoryEntity> categoryEntityList) {
@@ -51,7 +63,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                         .getCatId()
                         .longValue())
                 .peek(menu -> menu.setChildren(this.getChildren(menu, categoryEntityList)))
-                .sorted(Comparator.comparingInt(CategoryEntity::getSort))
+                .sorted(Comparator.comparingInt(menu -> (menu.getSort() == null ?
+                                                         0 :
+                                                         menu.getSort())))
                 .collect(Collectors.toList());
     }
 

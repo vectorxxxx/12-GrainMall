@@ -22,4 +22,9 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 server:
-  port: 10000
+  port: 10001
+
+# 日志级别调整，方便查看sql
+logging:
+  level:
+    xyz.funnyboy.gulimall.product: debug
