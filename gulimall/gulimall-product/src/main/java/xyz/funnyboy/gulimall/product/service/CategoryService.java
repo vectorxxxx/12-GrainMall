@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,5 +18,12 @@ public interface CategoryService extends IService<CategoryEntity>
 {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 查出所有分类 以及子分类，以树形结构组装起来
+     *
+     * @return {@link List}<{@link CategoryEntity}>
+     */
+    List<CategoryEntity> listWithTree();
 }
 

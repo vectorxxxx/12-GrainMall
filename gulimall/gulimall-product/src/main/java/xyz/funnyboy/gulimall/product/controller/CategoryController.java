@@ -8,6 +8,7 @@ import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -18,11 +19,19 @@ import java.util.Map;
  * @date 2024-01-28 21:22:07
  */
 @RestController
-@RequestMapping("product/category")
+@RequestMapping("/api/product/category")
 public class CategoryController
 {
     @Autowired
     private CategoryService categoryService;
+
+    @GetMapping("/list/tree")
+    public R list() {
+        List<CategoryEntity> categoryEntityList = categoryService.listWithTree();
+        return R
+                .ok()
+                .put("data", categoryEntityList);
+    }
 
     /**
      * 列表

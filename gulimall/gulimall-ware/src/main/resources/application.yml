@@ -22,4 +22,3 @@ mybatis-plus:
 
 server:
   port: 11000
-  port: 11000

@@ -8,8 +8,7 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr:
-          127.0.0.1:8848
+        server-addr: 127.0.0.1:8848
   application:
     name: gulimall-product
 
@@ -23,4 +22,4 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 server:
-  port: 6000
+  port: 10000
