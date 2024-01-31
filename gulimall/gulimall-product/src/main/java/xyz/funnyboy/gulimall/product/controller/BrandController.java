@@ -57,7 +57,7 @@ public class BrandController
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     // @RequiresPermissions("product:brand:save")
     public R save(
             @RequestBody
@@ -70,7 +70,7 @@ public class BrandController
     /**
      * 修改
      */
-    @RequestMapping("/update")
+    @PostMapping("/update")
     // @RequiresPermissions("product:brand:update")
     public R update(
             @RequestBody
