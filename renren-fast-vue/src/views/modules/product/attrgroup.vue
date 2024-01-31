@@ -102,7 +102,7 @@
 
 <script>
 import AddOrUpdate from './attrgroup-add-or-update'
-import Category from '../common/categroy'
+import Category from '../common/category'
 
 export default {
   components: {
