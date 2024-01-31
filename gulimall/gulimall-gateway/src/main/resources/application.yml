@@ -20,6 +20,7 @@ spring:
           predicates:
             - Query=url,qq
 
+        # 商品服务
         - id: product_route
           uri: lb://gulimall-product
           predicates:
@@ -27,6 +28,15 @@ spring:
           filters:
             - RewritePath=/api/(?<segment>.*),/$\{segment}
 
+        # 第三方服务
+        - id: third_party_route
+          uri: lb://gulimall-third-party
+          predicates:
+            - Path=/api/thirdparty/**
+          filters:
+            - RewritePath=/api/thirdparty/(?<segment>.*),/$\{segment}
+
+        # 后台管理
         - id: admin_route
           uri: lb://renren-fast # 路由给renren-fast
           predicates: # 什么情况下路由给它
