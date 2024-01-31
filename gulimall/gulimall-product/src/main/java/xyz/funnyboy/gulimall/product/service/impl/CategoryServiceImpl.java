@@ -10,9 +10,7 @@ import xyz.funnyboy.gulimall.product.dao.CategoryDao;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service("categoryService")
@@ -67,6 +65,70 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
                                                          0 :
                                                          menu.getSort())))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * 查找 Catelog 路径
+     *
+     * @param catelogId 分类 ID
+     * @return {@link Long[]}
+     */
+    @Override
+    public Long[] findCatelogPath(Long catelogId) {
+        List<Long> catelogPathList = new ArrayList<>();
+        this.findCatelogPath(catelogPathList, catelogId);
+        Collections.reverse(catelogPathList);
+        return catelogPathList.toArray(new Long[0]);
+    }
+
+    /**
+     * 递归查找 Catelog 路径
+     *
+     * @param catelogPathList 分类路径列表
+     * @param catelogId       分类 ID
+     */
+    private void findCatelogPath(List<Long> catelogPathList, Long catelogId) {
+        catelogPathList.add(catelogId);
+
+        final CategoryEntity category = baseMapper.selectById(catelogId);
+        if (category == null) {
+            return;
+        }
+
+        final Long parentCid = category.getParentCid();
+        if (catelogId == null || parentCid == 0) {
+            return;
+        }
+
+        findCatelogPath(catelogPathList, parentCid);
+    }
+
+    /**
+     * 查找 Catelog 路径名
+     *
+     * @param catelogId 分类 ID
+     * @return {@link String}
+     */
+    @Override
+    public String findCatelogPathName(Long catelogId) {
+        List<String> catelogPathNameList = new ArrayList<>();
+        this.findCatelogPathName(catelogPathNameList, catelogId);
+        Collections.reverse(catelogPathNameList);
+        return String.join(" / ", catelogPathNameList);
+    }
+
+    private void findCatelogPathName(List<String> catelogPathNameList, Long catelogId) {
+        final CategoryEntity category = this.getById(catelogId);
+        if (category == null) {
+            return;
+        }
+        catelogPathNameList.add(category.getName());
+
+        final Long parentCid = category.getParentCid();
+        if (parentCid == null || parentCid == 0) {
+            return;
+        }
+        findCatelogPathName(catelogPathNameList, parentCid);
     }
 
 }

@@ -17,5 +17,15 @@ public interface AttrGroupService extends IService<AttrGroupEntity>
 {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 分页查询
+     *
+     * @param params    参数
+     * @param catelogId 分类 ID
+     * @return {@link PageUtils}
+     */
+    PageUtils queryPage(Map<String, Object> params, Long catelogId);
+
 }
 

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -63,5 +64,7 @@ public class CategoryEntity implements Serializable
     private Integer productCount;
 
     @TableField(exist = false)
+    // 用于指定在序列化Java对象为JSON时，只包括非空值的属性。这意味着如果一个属性的值为null或者空字符串，那么在序列化时将不会包括该属性
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<CategoryEntity> children;
 }

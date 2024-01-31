@@ -69,7 +69,7 @@ export default {
         ],
         showStatus: [
           {required: true, message: '显示状态[0-不显示；1-显示]不能为空', trigger: 'blur'}
-        ]
+        ],
         firstLetter: [
           {
             validator: (rule, value, callback) => {
@@ -81,7 +81,8 @@ export default {
                 callback()
               }
             },
-            trigger: 'blur'}
+            trigger: 'blur'
+          }
         ],
         sort: [
           {

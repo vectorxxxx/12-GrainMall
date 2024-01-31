@@ -6,6 +6,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.entity.AttrGroupEntity;
 import xyz.funnyboy.gulimall.product.service.AttrGroupService;
+import xyz.funnyboy.gulimall.product.service.CategoryService;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -24,15 +25,21 @@ public class AttrGroupController
     @Autowired
     private AttrGroupService attrGroupService;
 
+    @Autowired
+    private CategoryService categoryService;
+
     /**
      * 列表
      */
-    @RequestMapping("/list")
+    @RequestMapping("/list/{catelogId}")
     // @RequiresPermissions("product:attrgroup:list")
     public R list(
+            @PathVariable(value = "catelogId",
+                          required = false)
+                    Long catelogId,
             @RequestParam
                     Map<String, Object> params) {
-        PageUtils page = attrGroupService.queryPage(params);
+        PageUtils page = attrGroupService.queryPage(params, catelogId);
 
         return R
                 .ok()
@@ -49,6 +56,10 @@ public class AttrGroupController
                     Long attrGroupId) {
         AttrGroupEntity attrGroup = attrGroupService.getById(attrGroupId);
 
+        // 获取当前分类的完整路径
+        Long[] catelogPath = categoryService.findCatelogPath(attrGroup.getCatelogId());
+        attrGroup.setCatelogPath(catelogPath);
+
         return R
                 .ok()
                 .put("attrGroup", attrGroup);
@@ -57,7 +68,7 @@ public class AttrGroupController
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     // @RequiresPermissions("product:attrgroup:save")
     public R save(
             @RequestBody

@@ -1,20 +1,26 @@
 package xyz.funnyboy.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.gulimall.product.dao.AttrGroupDao;
 import xyz.funnyboy.gulimall.product.entity.AttrGroupEntity;
 import xyz.funnyboy.gulimall.product.service.AttrGroupService;
+import xyz.funnyboy.gulimall.product.service.CategoryService;
 
 import java.util.Map;
 
 @Service("attrGroupService")
 public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEntity> implements AttrGroupService
 {
+    @Autowired
+    private CategoryService categoryService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -23,4 +29,36 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
         return new PageUtils(page);
     }
 
+    /**
+     * 分页查询
+     *
+     * @param params    参数
+     * @param catelogId 分类 ID
+     * @return {@link PageUtils}
+     */
+    @Override
+    public PageUtils queryPage(Map<String, Object> params, Long catelogId) {
+        // 分页参数
+        final IPage<AttrGroupEntity> pageParam = new Query<AttrGroupEntity>().getPage(params);
+        // 查询条件
+        final String key = (String) params.get("key");
+        final LambdaQueryWrapper<AttrGroupEntity> queryWrapper = new LambdaQueryWrapper<AttrGroupEntity>()
+                .eq(!StringUtils.isEmpty(key), AttrGroupEntity::getAttrGroupId, key)
+                .or()
+                .like(!StringUtils.isEmpty(key), AttrGroupEntity::getAttrGroupName, key);
+        queryWrapper.eq(catelogId != null && catelogId != 0, AttrGroupEntity::getCatelogId, catelogId);
+
+        // 分页查询
+        IPage<AttrGroupEntity> page = this.page(pageParam, queryWrapper);
+
+        // 获取当前分类的完整路径
+        page
+                .getRecords()
+                .forEach(attrGroup -> {
+                    final String catelogPath = categoryService.findCatelogPathName(attrGroup.getCatelogId());
+                    attrGroup.setCatelogPathName(catelogPath);
+                });
+
+        return new PageUtils(page);
+    }
 }
