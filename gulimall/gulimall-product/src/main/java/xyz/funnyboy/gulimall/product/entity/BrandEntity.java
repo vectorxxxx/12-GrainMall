@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
+import xyz.funnyboy.common.validator.group.AddGroup;
+import xyz.funnyboy.common.validator.group.UpdateGroup;
 
 import javax.validation.constraints.*;
 import java.io.Serializable;
@@ -24,6 +26,10 @@ public class BrandEntity implements Serializable
     /**
      * 品牌id
      */
+    @NotNull(message = "修改必须定制品牌id",
+             groups = {UpdateGroup.class})
+    @Null(message = "新增不能指定id",
+          groups = {AddGroup.class})
     @TableId
     private Long brandId;
 
@@ -36,8 +42,10 @@ public class BrandEntity implements Serializable
     /**
      * 品牌logo地址
      */
-    @NotEmpty(message = "品牌logo地址不能为空")
-    @URL(message = "品牌logo地址格式不正确")
+    @NotEmpty(message = "品牌logo地址不能为空",
+              groups = {AddGroup.class})
+    @URL(message = "品牌logo地址格式不正确",
+         groups = {AddGroup.class, UpdateGroup.class})
     private String logo;
 
     /**

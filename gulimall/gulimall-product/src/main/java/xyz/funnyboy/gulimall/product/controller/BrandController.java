@@ -1,13 +1,15 @@
 package xyz.funnyboy.gulimall.product.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
+import xyz.funnyboy.common.validator.group.AddGroup;
+import xyz.funnyboy.common.validator.group.UpdateGroup;
 import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.service.BrandService;
 
-import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -56,21 +58,35 @@ public class BrandController
     }
 
     /**
-     * 保存
+     * 保存(V3: JSR303校验，定义了统一异常处理且进行了分组校验时的写法)
      */
     @PostMapping("/save")
     // @RequiresPermissions("product:brand:save")
-    public R save(@Valid
-                  @RequestBody
-                          BrandEntity brand) {
+    public R save(
+            @Validated(AddGroup.class)
+            @RequestBody
+                    BrandEntity brand) {
         brandService.save(brand);
 
         return R.ok();
     }
 
+    // /**
+    //  * 保存(V2: JSR303校验，定义了统一异常处理但未进行分组校验时的写法)
+    //  */
+    // @PostMapping("/save")
+    // // @RequiresPermissions("product:brand:save")
+    // public R save(@Valid
+    //               @RequestBody
+    //                       BrandEntity brand) {
+    //     brandService.save(brand);
+    //
+    //     return R.ok();
+    // }
+
     //
     // /**
-    //  * 保存
+    //  * 保存(V1: JSR303校验，未定义统一异常处理和进行分组校验时的写法)
     //  */
     // @PostMapping("/save")
     // // @RequiresPermissions("product:brand:save")
@@ -98,6 +114,7 @@ public class BrandController
     @PostMapping("/update")
     // @RequiresPermissions("product:brand:update")
     public R update(
+            @Validated(UpdateGroup.class)
             @RequestBody
                     BrandEntity brand) {
         brandService.updateById(brand);
