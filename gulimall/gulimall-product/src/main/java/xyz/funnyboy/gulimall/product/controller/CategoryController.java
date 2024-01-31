@@ -30,7 +30,7 @@ public class CategoryController
         List<CategoryEntity> categoryEntityList = categoryService.listWithTree();
         return R
                 .ok()
-                .put("menus", categoryEntityList);
+                .put("data", categoryEntityList);
     }
 
     /**
@@ -60,7 +60,7 @@ public class CategoryController
 
         return R
                 .ok()
-                .put("category", category);
+                .put("data", category);
     }
 
     /**
@@ -79,12 +79,12 @@ public class CategoryController
     /**
      * 修改
      */
-    @PutMapping("/update")
+    @PostMapping("/update")
     // @RequiresPermissions("product:category:update")
     public R update(
             @RequestBody
                     CategoryEntity category) {
-        categoryService.updateById(category);
+        categoryService.updateCascade(category);
 
         return R.ok();
     }

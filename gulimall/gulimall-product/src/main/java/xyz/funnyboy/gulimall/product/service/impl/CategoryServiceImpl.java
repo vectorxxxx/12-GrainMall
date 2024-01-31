@@ -3,9 +3,11 @@ package xyz.funnyboy.gulimall.product.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
+import xyz.funnyboy.gulimall.product.dao.CategoryBrandRelationDao;
 import xyz.funnyboy.gulimall.product.dao.CategoryDao;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
@@ -16,6 +18,8 @@ import java.util.stream.Collectors;
 @Service("categoryService")
 public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity> implements CategoryService
 {
+    @Autowired
+    private CategoryBrandRelationDao categoryBrandRelationDao;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -131,4 +135,14 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         findCatelogPathName(catelogPathNameList, parentCid);
     }
 
+    /**
+     * 级联更新数据
+     *
+     * @param category 类别
+     */
+    @Override
+    public void updateCascade(CategoryEntity category) {
+        this.updateById(category);
+        categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
+    }
 }

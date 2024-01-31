@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="xyz.funnyboy.gulimall.product.dao.CategoryBrandRelationDao">
-
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity" id="categoryBrandRelationMap">
         <result property="id" column="id"/>
         <result property="brandId" column="brand_id"/>
@@ -12,5 +11,9 @@
         <result property="catelogName" column="catelog_name"/>
     </resultMap>
 
-
+    <update id="updateCategory">
+        update pms_category_brand_relation
+        set catelog_name=#{catelogName}
+        where catelog_id = #{catelogId}
+    </update>
 </mapper>

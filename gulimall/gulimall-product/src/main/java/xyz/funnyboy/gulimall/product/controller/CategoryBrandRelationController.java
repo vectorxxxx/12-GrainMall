@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.product.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import xyz.funnyboy.common.utils.PageUtils;
@@ -8,6 +9,7 @@ import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryBrandRelationService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +25,17 @@ public class CategoryBrandRelationController
 {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @GetMapping("/catelog/list")
+    public R listCategory(
+            @RequestParam
+                    Long brandId) {
+        final List<CategoryBrandRelationEntity> list = categoryBrandRelationService.list(
+                new LambdaQueryWrapper<CategoryBrandRelationEntity>().eq(CategoryBrandRelationEntity::getBrandId, brandId));
+        return R
+                .ok()
+                .put("data", list);
+    }
 
     /**
      * 列表
@@ -57,12 +70,12 @@ public class CategoryBrandRelationController
     /**
      * 保存
      */
-    @RequestMapping("/save")
+    @PostMapping("/save")
     // @RequiresPermissions("product:categorybrandrelation:save")
     public R save(
             @RequestBody
                     CategoryBrandRelationEntity categoryBrandRelation) {
-        categoryBrandRelationService.save(categoryBrandRelation);
+        categoryBrandRelationService.saveDetail(categoryBrandRelation);
 
         return R.ok();
     }

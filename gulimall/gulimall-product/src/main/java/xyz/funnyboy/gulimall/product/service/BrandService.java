@@ -17,5 +17,12 @@ public interface BrandService extends IService<BrandEntity>
 {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 按 ID 详细信息更新
+     *
+     * @param brand 品牌
+     */
+    void updateByIdDetail(BrandEntity brand);
 }
 

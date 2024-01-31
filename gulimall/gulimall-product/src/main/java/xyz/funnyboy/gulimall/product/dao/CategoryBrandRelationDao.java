@@ -2,6 +2,7 @@ package xyz.funnyboy.gulimall.product.dao;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
 
 /**
@@ -15,4 +16,15 @@ import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
 public interface CategoryBrandRelationDao extends BaseMapper<CategoryBrandRelationEntity>
 {
 
+    /**
+     * 更新分类名称
+     *
+     * @param catelogId   分类 ID
+     * @param catelogName 分类名称
+     */
+    void updateCategory(
+            @Param("catelogId")
+                    Long catelogId,
+            @Param("catelogName")
+                    String catelogName);
 }

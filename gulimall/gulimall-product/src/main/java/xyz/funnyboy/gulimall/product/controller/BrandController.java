@@ -7,6 +7,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.common.validator.group.AddGroup;
 import xyz.funnyboy.common.validator.group.UpdateGroup;
+import xyz.funnyboy.common.validator.group.UpdateStatusGroup;
 import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.service.BrandService;
 
@@ -117,8 +118,21 @@ public class BrandController
             @Validated(UpdateGroup.class)
             @RequestBody
                     BrandEntity brand) {
-        brandService.updateById(brand);
+        // 要对品牌（分类）名字进行修改时，品牌分类关系表之中的名字也要进行修改
+        brandService.updateByIdDetail(brand);
 
+        return R.ok();
+    }
+
+    /**
+     * 修改状态
+     */
+    @RequestMapping("/update/status")
+    public R updateStatus(
+            @Validated(UpdateStatusGroup.class)
+            @RequestBody
+                    BrandEntity brand) {
+        brandService.updateById(brand);
         return R.ok();
     }
 
