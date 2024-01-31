@@ -7,6 +7,7 @@ import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.service.BrandService;
 
+import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -59,13 +60,37 @@ public class BrandController
      */
     @PostMapping("/save")
     // @RequiresPermissions("product:brand:save")
-    public R save(
-            @RequestBody
-                    BrandEntity brand) {
+    public R save(@Valid
+                  @RequestBody
+                          BrandEntity brand) {
         brandService.save(brand);
 
         return R.ok();
     }
+
+    //
+    // /**
+    //  * 保存
+    //  */
+    // @PostMapping("/save")
+    // // @RequiresPermissions("product:brand:save")
+    // public R save(@Valid
+    //               @RequestBody
+    //                       BrandEntity brand, BindingResult result) {
+    //     if (result.hasErrors()) {
+    //         final Map<String, String> map = result
+    //                 .getFieldErrors()
+    //                 .stream()
+    //                 .filter(fieldError -> !StringUtils.isEmpty(fieldError.getDefaultMessage()) && !StringUtils.isEmpty(fieldError.getField()))
+    //                 .collect(Collectors.toMap(FieldError::getField, FieldError::getDefaultMessage));
+    //         return R
+    //                 .error(400, "提交的数据不合法")
+    //                 .put("data", map);
+    //     }
+    //     brandService.save(brand);
+    //
+    //     return R.ok();
+    // }
 
     /**
      * 修改
