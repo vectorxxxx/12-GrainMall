@@ -11,7 +11,9 @@ package xyz.funnyboy.common.validator.group;
 /**
  * 新增数据 Group
  *
- * @author Mark sunlightcs@gmail.com
+ * @author VectorX
+ * @version 1.0.0
+ * @date 2024/01/31
  */
 public interface AddGroup
 {
