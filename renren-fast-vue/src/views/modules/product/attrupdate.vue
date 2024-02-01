@@ -110,7 +110,7 @@ export default {
             let v = ''
             if (_this.spuAttrsMap['' + attr.attrId]) {
               v = _this.spuAttrsMap['' + attr.attrId].attrValue.split(';')
-              if (v.length == 1) {
+              if (v.length === 1) {
                 v = v[0] + ''
               }
             }
@@ -141,7 +141,7 @@ export default {
             val = attr.attrValues
           }
 
-          if (val != '') {
+          if (val !== '') {
             submitData.push({
               attrId: attr.attrId,
               attrName: attr.attrName,

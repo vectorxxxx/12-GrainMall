@@ -44,7 +44,7 @@
       <el-form-item label="所属分类" prop="catelogId">
         <category-cascader :catelogPath.sync="catelogPath"></category-cascader>
       </el-form-item>
-      <el-form-item label="所属分组" prop="attrGroupId" v-if="type == 1">
+      <el-form-item label="所属分组" prop="attrGroupId" v-if="type === 1">
         <el-select ref="groupSelect" v-model="dataForm.attrGroupId" placeholder="请选择">
           <el-option
             v-for="item in attrGroups"
@@ -54,7 +54,7 @@
           ></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="可检索" prop="searchType" v-if="type == 1">
+      <el-form-item label="可检索" prop="searchType" v-if="type === 1">
         <el-switch
           v-model="dataForm.searchType"
           active-color="#13ce66"
@@ -63,7 +63,7 @@
           :inactive-value="0"
         ></el-switch>
       </el-form-item>
-      <el-form-item label="快速展示" prop="showDesc" v-if="type == 1">
+      <el-form-item label="快速展示" prop="showDesc" v-if="type === 1">
         <el-switch
           v-model="dataForm.showDesc"
           active-color="#13ce66"
@@ -176,7 +176,7 @@ export default {
       this.attrGroups = []
       this.dataForm.attrGroupId = ''
       this.dataForm.catelogId = path[path.length - 1]
-      if (path && path.length == 3) {
+      if (path && path.length === 3) {
         this.$http({
           url: this.$http.adornUrl(
             `/product/attrgroup/list/${path[path.length - 1]}`
@@ -190,7 +190,7 @@ export default {
             this.$message.error(data.msg)
           }
         })
-      } else if (path.length == 0) {
+      } else if (path.length === 0) {
         this.dataForm.catelogId = ''
       } else {
         this.$message.error('请选择正确的分类')
