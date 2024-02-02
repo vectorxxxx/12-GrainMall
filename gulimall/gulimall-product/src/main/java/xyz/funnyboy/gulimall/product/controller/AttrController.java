@@ -4,11 +4,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
+import xyz.funnyboy.gulimall.product.entity.ProductAttrValueEntity;
 import xyz.funnyboy.gulimall.product.service.AttrService;
+import xyz.funnyboy.gulimall.product.service.ProductAttrValueService;
 import xyz.funnyboy.gulimall.product.vo.AttrRespVo;
 import xyz.funnyboy.gulimall.product.vo.AttrVo;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -24,6 +27,28 @@ public class AttrController
 {
     @Autowired
     private AttrService attrService;
+
+    @Autowired
+    private ProductAttrValueService productAttrValueService;
+
+    @PostMapping("/update/{spuId}")
+    public R updateSpuAttr(
+            @PathVariable("spuId")
+                    Long spuId,
+            @RequestBody
+                    List<ProductAttrValueEntity> entities) {
+        productAttrValueService.updateSpuAttr(spuId, entities);
+        return R.ok();
+    }
+
+    @GetMapping("/base/listforspu/{spuId}")
+    public R baseListforspu(
+            @PathVariable("spuId")
+                    Long spuId) {
+        return R
+                .ok()
+                .put("data", productAttrValueService.baseAttrlistForSpu(spuId));
+    }
 
     @GetMapping("/{attrType}/list/{catelogId}")
     public R baseList(

@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -52,4 +53,29 @@ public class ProductAttrValueServiceImpl extends ServiceImpl<ProductAttrValueDao
         this.saveBatch(productAttrValueEntityList);
     }
 
+    /**
+     * 获取spu规格
+     *
+     * @param spuId SPU ID
+     * @return {@link List}<{@link ProductAttrValueEntity}>
+     */
+    @Override
+    public List<ProductAttrValueEntity> baseAttrlistForSpu(Long spuId) {
+        return baseMapper.selectList(new LambdaQueryWrapper<ProductAttrValueEntity>().eq(ProductAttrValueEntity::getSpuId, spuId));
+    }
+
+    /**
+     * 修改商品规格
+     *
+     * @param spuId    SPU ID
+     * @param entities 实体
+     */
+    @Override
+    public void updateSpuAttr(Long spuId, List<ProductAttrValueEntity> entities) {
+        // 删除旧数据
+        baseMapper.delete(new LambdaQueryWrapper<ProductAttrValueEntity>().eq(ProductAttrValueEntity::getSpuId, spuId));
+        // 保存新数据
+        entities.forEach(entity -> entity.setSpuId(spuId));
+        this.saveBatch(entities);
+    }
 }

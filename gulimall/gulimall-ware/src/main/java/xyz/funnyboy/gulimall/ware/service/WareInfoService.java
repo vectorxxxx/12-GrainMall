@@ -13,8 +13,17 @@ import java.util.Map;
  * @email uxiahnan@outlook.com
  * @date 2024-01-29 10:26:44
  */
-public interface WareInfoService extends IService<WareInfoEntity> {
+public interface WareInfoService extends IService<WareInfoEntity>
+{
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 按条件查询页面
+     *
+     * @param params 参数
+     * @return {@link PageUtils}
+     */
+    PageUtils queryPageByCondition(Map<String, Object> params);
 }
 
