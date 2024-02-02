@@ -184,16 +184,16 @@ export default {
     }
   },
   mounted () {
-    this.catPathSub = PubSub.subscribe('catPath', (msg, val) => {
+    this.catPathSub = this.PubSub.subscribe('catPath', (msg, val) => {
       this.dataForm.catelogId = val[val.length - 1]
     })
-    this.brandIdSub = PubSub.subscribe('brandId', (msg, val) => {
+    this.brandIdSub = this.PubSub.subscribe('brandId', (msg, val) => {
       this.dataForm.brandId = val
     })
   },
   beforeDestroy () {
-    PubSub.unsubscribe(this.catPathSub)
-    PubSub.unsubscribe(this.brandIdSub)
+    this.PubSub.unsubscribe(this.catPathSub)
+    this.PubSub.unsubscribe(this.brandIdSub)
   } // 生命周期 - 销毁之前
 }
 </script>

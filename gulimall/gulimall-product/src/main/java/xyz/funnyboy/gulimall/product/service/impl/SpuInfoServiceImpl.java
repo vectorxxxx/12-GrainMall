@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -7,6 +8,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.to.SkuReductionTO;
 import xyz.funnyboy.common.to.SpuBoundTO;
 import xyz.funnyboy.common.utils.PageUtils;
@@ -84,6 +86,29 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
                 .getSkus()
                 .forEach(item -> saveSkuInfo(spuSaveVo, spuId, item));
 
+    }
+
+    @Override
+    public PageUtils queryPageByCondition(Map<String, Object> params) {
+        // 获取参数
+        final String brandId = (String) params.get("brandId");
+        final String catelogId = (String) params.get("catelogId");
+        final String status = (String) params.get("status");
+        final String key = (String) params.get("key");
+
+        // 查询条件
+        final LambdaQueryWrapper<SpuInfoEntity> queryWrapper = new LambdaQueryWrapper<SpuInfoEntity>()
+                .eq(!StringUtils.isEmpty(brandId) && !"0".equalsIgnoreCase(brandId), SpuInfoEntity::getBrandId, brandId)
+                .eq(!StringUtils.isEmpty(catelogId) && !"0".equalsIgnoreCase(catelogId), SpuInfoEntity::getCatalogId, catelogId)
+                .eq(!StringUtils.isEmpty(status), SpuInfoEntity::getPublishStatus, status)
+                .and(!StringUtils.isEmpty(key), wrapper -> wrapper
+                        .eq(SpuInfoEntity::getId, key)
+                        .or()
+                        .like(SpuInfoEntity::getSpuName, key));
+
+        // 分页查询
+        final IPage<SpuInfoEntity> page = baseMapper.selectPage(new Query<SpuInfoEntity>().getPage(params), queryWrapper);
+        return new PageUtils(page);
     }
 
     /**

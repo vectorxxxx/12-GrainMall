@@ -17,5 +17,13 @@ public interface SkuInfoService extends IService<SkuInfoEntity>
 {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 按条件分页查询
+     *
+     * @param params 参数
+     * @return {@link PageUtils}
+     */
+    PageUtils queryPageByCondition(Map<String, Object> params);
 }
 

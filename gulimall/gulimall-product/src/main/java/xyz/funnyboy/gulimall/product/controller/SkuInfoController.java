@@ -32,7 +32,7 @@ public class SkuInfoController
     public R list(
             @RequestParam
                     Map<String, Object> params) {
-        PageUtils page = skuInfoService.queryPage(params);
+        PageUtils page = skuInfoService.queryPageByCondition(params);
 
         return R
                 .ok()

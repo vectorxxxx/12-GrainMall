@@ -144,14 +144,14 @@ export default {
     }
   },
   mounted () {
-    this.dataSub = PubSub.subscribe('dataForm', (msg, val) => {
+    this.dataSub = this.PubSub.subscribe('dataForm', (msg, val) => {
       console.log('~~~~~', val)
       this.dataForm = val
       this.getDataList()
     })
   },
   beforeDestroy () {
-    PubSub.unsubscribe(this.dataSub)
+    this.PubSub.unsubscribe(this.dataSub)
   }
 }
 </script>

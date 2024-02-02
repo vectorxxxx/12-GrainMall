@@ -61,7 +61,7 @@ export default {
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
     // 监听三级分类消息的变化
-    this.subscribe = PubSub.subscribe('catPath', (msg, val) => {
+    this.subscribe = this.PubSub.subscribe('catPath', (msg, val) => {
       this.catId = val[val.length - 1]
       this.getCatBrands()
     })
@@ -75,7 +75,7 @@ export default {
   updated () {
   }, // 生命周期 - 更新之后
   beforeDestroy () {
-    PubSub.unsubscribe(this.subscribe) // 销毁订阅
+    this.PubSub.unsubscribe(this.subscribe) // 销毁订阅
   }, // 生命周期 - 销毁之前
   destroyed () {
   }, // 生命周期 - 销毁完成

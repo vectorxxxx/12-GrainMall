@@ -789,12 +789,10 @@ export default {
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted () {
-    // eslint-disable-next-line no-undef
-    this.catPathSub = PubSub.subscribe('catPath', (msg, val) => {
+    this.catPathSub = this.PubSub.subscribe('catPath', (msg, val) => {
       this.spu.catalogId = val[val.length - 1]
     })
-    // eslint-disable-next-line no-undef
-    this.brandIdSub = PubSub.subscribe('brandId', (msg, val) => {
+    this.brandIdSub = this.PubSub.subscribe('brandId', (msg, val) => {
       this.spu.brandId = val
     })
     this.getMemberLevels()
@@ -808,10 +806,8 @@ export default {
   updated () {
   }, // 生命周期 - 更新之后
   beforeDestroy () {
-    // eslint-disable-next-line no-undef
-    PubSub.unsubscribe(this.catPathSub)
-    // eslint-disable-next-line no-undef
-    PubSub.unsubscribe(this.brandIdSub)
+    this.PubSub.unsubscribe(this.catPathSub)
+    this.PubSub.unsubscribe(this.brandIdSub)
   }, // 生命周期 - 销毁之前
   destroyed () {
   }, // 生命周期 - 销毁完成
