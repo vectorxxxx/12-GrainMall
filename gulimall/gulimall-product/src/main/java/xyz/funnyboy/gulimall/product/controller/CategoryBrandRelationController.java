@@ -7,6 +7,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryBrandRelationService;
+import xyz.funnyboy.gulimall.product.vo.BrandVo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,16 @@ public class CategoryBrandRelationController
 {
     @Autowired
     private CategoryBrandRelationService categoryBrandRelationService;
+
+    @GetMapping("/brands/list")
+    public R relationBrandList(
+            @RequestParam("catId")
+                    Long catId) {
+        List<BrandVo> brandVoList = categoryBrandRelationService.getBrandByCatId(catId);
+        return R
+                .ok()
+                .put("data", brandVoList);
+    }
 
     @GetMapping("/catelog/list")
     public R listCategory(

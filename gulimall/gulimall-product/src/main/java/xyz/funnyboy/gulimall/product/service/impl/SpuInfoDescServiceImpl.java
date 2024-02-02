@@ -10,6 +10,7 @@ import xyz.funnyboy.gulimall.product.dao.SpuInfoDescDao;
 import xyz.funnyboy.gulimall.product.entity.SpuInfoDescEntity;
 import xyz.funnyboy.gulimall.product.service.SpuInfoDescService;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("spuInfoDescService")
@@ -21,6 +22,14 @@ public class SpuInfoDescServiceImpl extends ServiceImpl<SpuInfoDescDao, SpuInfoD
         IPage<SpuInfoDescEntity> page = this.page(new Query<SpuInfoDescEntity>().getPage(params), new QueryWrapper<SpuInfoDescEntity>());
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public void saveDescript(Long spuId, List<String> descript) {
+        final SpuInfoDescEntity spuInfoDescEntity = new SpuInfoDescEntity();
+        spuInfoDescEntity.setSpuId(spuId);
+        spuInfoDescEntity.setDecript(String.join(",", descript));
+        baseMapper.insert(spuInfoDescEntity);
     }
 
 }

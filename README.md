@@ -1,4 +1,6 @@
-## 1、安装 Vagrant
+一、Linux 环境搭建
+
+### 1、安装 Vagrant
 
 ```bash
 # 初始化一个centos7系统
@@ -24,7 +26,7 @@ vagrant reload
 ip addr
 ```
 
-## 2、修改 yum 源
+### 2、修改 yum 源
 
 ```bash
 # 查看可用yum源
@@ -40,7 +42,7 @@ curl -o /etc/yum.repos.d/CentOS-Base.repo http://mirrors.163.com/.help/CentOS7-B
 yum makecache
 ```
 
-## 3、允许账号密码登录
+### 3、允许账号密码登录
 
 ```bash
 vi /etc/ssh/sshd_config
@@ -50,7 +52,7 @@ vi /etc/ssh/sshd_config
 service sshd restart
 ```
 
-## 4、安装 Docker
+### 4、安装 Docker
 
 ```bash
 # 卸载旧版本
@@ -106,7 +108,7 @@ docker images
 
 
 
-## 5、Docker 安装 MySQL
+### 5、Docker 安装 MySQL
 
 ```bash
 # 拉取 MySQL 镜像
@@ -191,7 +193,7 @@ flush privileges;
 exit;
 ```
 
-## 6、Docker 安装 Redis
+### 6、Docker 安装 Redis
 
 ```bash
 # 下载镜像文件
@@ -209,10 +211,14 @@ docker run -p 6379:6379 --name redis \
 redis-server /etc/redis/redis.conf
 
 # 使用 redis 镜像执行 redis-cli 命令连接
-docker
+docker exec -it redis redis-cli
+
+# 默认存储在内存中，需要修改为持久化方式
+vi /mydata/redis/conf/redis.conf
+appendonly yes
 ```
 
-## 7、Docker 容器自启动
+### 7、Docker 容器自启动
 
 ```bash
 # MySQL 容器自启动
@@ -220,4 +226,25 @@ docker update mysql --restart=always
 # Redis 容器自启动
 docker update redis --restart=always
 ```
+
+
+
+## 二、开发环境搭建
+
+### 1、Spring Cloud Alibaba、Spring Cloud、Spring Boot 版本选择
+
+参考文档：[毕业版本依赖关系(推荐使用)](https://developer.aliyun.com/article/876964)
+
+| Spring Cloud Alibaba Version      | Spring Cloud Version                | Spring Boot Version   |
+| --------------------------------- | ----------------------------------- | --------------------- |
+| 2021.0.1.0                        | Spring Cloud 2021.0.1               | 2.6.3                 |
+| 2.2.7.RELEASE                     | Spring Cloud Hoxton.SR12            | 2.3.12.RELEASE        |
+| 2021.1                            | Spring Cloud 2020.0.1               | 2.4.2                 |
+| 2.2.6.RELEASE                     | Spring Cloud Hoxton.SR9             | 2.3.2.RELEASE         |
+| 2.1.4.RELEASE                     | Spring Cloud Greenwich.SR6          | 2.1.13.RELEASE        |
+| 2.2.1.RELEASE                     | Spring Cloud Hoxton.SR3             | 2.2.5.RELEASE         |
+| ==**2.2.0.RELEASE**==             | ==**Spring Cloud Hoxton.RELEASE**== | ==**2.2.X.RELEASE**== |
+| 2.1.2.RELEASE                     | Spring Cloud Greenwich              | 2.1.X.RELEASE         |
+| 2.0.4.RELEASE(停止维护，建议升级) | Spring Cloud Finchley               | 2.0.X.RELEASE         |
+| 1.5.1.RELEASE(停止维护，建议升级) | Spring Cloud Edgware                | 1.5.X.RELEASE         |
 

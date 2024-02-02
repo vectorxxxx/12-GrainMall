@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.AttrGroupEntity;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupRelationVo;
+import xyz.funnyboy.gulimall.product.vo.AttrGroupWithAttrsVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,5 +36,13 @@ public interface AttrGroupService extends IService<AttrGroupEntity>
      * @param attrGroupEntities 属性分组关联关系集合
      */
     void deleteRelation(AttrGroupRelationVo[] attrGroupEntities);
+
+    /**
+     * 根据分类ID获取携带属性集合的属性分组集合
+     *
+     * @param catelogId 分类 ID
+     * @return {@link List}<{@link AttrGroupWithAttrsVo}>
+     */
+    List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId);
 }
 

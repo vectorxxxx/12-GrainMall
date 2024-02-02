@@ -11,10 +11,14 @@ import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.gulimall.product.dao.BrandDao;
 import xyz.funnyboy.gulimall.product.dao.CategoryBrandRelationDao;
 import xyz.funnyboy.gulimall.product.dao.CategoryDao;
+import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryBrandRelationService;
+import xyz.funnyboy.gulimall.product.vo.BrandVo;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service("categoryBrandRelationService")
 public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandRelationDao, CategoryBrandRelationEntity> implements CategoryBrandRelationService
@@ -72,6 +76,28 @@ public class CategoryBrandRelationServiceImpl extends ServiceImpl<CategoryBrandR
         categoryBrandRelationEntity.setBrandId(brandId);
         categoryBrandRelationEntity.setBrandName(name);
         this.update(categoryBrandRelationEntity, new LambdaQueryWrapper<CategoryBrandRelationEntity>().eq(CategoryBrandRelationEntity::getBrandId, brandId));
+    }
+
+    @Override
+    public List<BrandVo> getBrandByCatId(Long catId) {
+        // 查询品牌 ID 列表
+        final List<Long> brandIdList = baseMapper
+                .selectList(new LambdaQueryWrapper<CategoryBrandRelationEntity>().eq(CategoryBrandRelationEntity::getCatelogId, catId))
+                .stream()
+                .map(CategoryBrandRelationEntity::getBrandId)
+                .collect(Collectors.toList());
+
+        // 查询品牌信息
+        return brandDao
+                .selectList(new LambdaQueryWrapper<BrandEntity>().in(BrandEntity::getBrandId, brandIdList))
+                .stream()
+                .map(brandEntity -> {
+                    final BrandVo brandVo = new BrandVo();
+                    brandVo.setBrandId(brandEntity.getBrandId());
+                    brandVo.setBrandName(brandEntity.getName());
+                    return brandVo;
+                })
+                .collect(Collectors.toList());
     }
 
 }

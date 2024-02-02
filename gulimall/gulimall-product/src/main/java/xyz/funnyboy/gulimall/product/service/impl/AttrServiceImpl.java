@@ -120,7 +120,9 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
                                 new LambdaQueryWrapper<AttrAttrgroupRelationEntity>().eq(AttrAttrgroupRelationEntity::getAttrId, item.getAttrId()));
                         if (attrAttrgroupRelationEntity != null && attrAttrgroupRelationEntity.getAttrGroupId() != null) {
                             final AttrGroupEntity attrGroupEntity = attrGroupDao.selectById(attrAttrgroupRelationEntity.getAttrGroupId());
-                            attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                            if (attrGroupEntity != null) {
+                                attrRespVo.setGroupName(attrGroupEntity.getAttrGroupName());
+                            }
                         }
                     }
 

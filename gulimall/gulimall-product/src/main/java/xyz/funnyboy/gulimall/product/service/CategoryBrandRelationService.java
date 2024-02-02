@@ -3,7 +3,9 @@ package xyz.funnyboy.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.CategoryBrandRelationEntity;
+import xyz.funnyboy.gulimall.product.vo.BrandVo;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,5 +34,13 @@ public interface CategoryBrandRelationService extends IService<CategoryBrandRela
      * @param name    名字
      */
     void updateBrand(Long brandId, String name);
+
+    /**
+     * 通过分类 ID 获取品牌
+     *
+     * @param catId 分类 ID
+     * @return {@link List}<{@link BrandVo}>
+     */
+    List<BrandVo> getBrandByCatId(Long catId);
 }
 

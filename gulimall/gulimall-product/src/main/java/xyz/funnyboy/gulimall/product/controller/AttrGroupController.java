@@ -11,6 +11,7 @@ import xyz.funnyboy.gulimall.product.service.AttrGroupService;
 import xyz.funnyboy.gulimall.product.service.AttrService;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupRelationVo;
+import xyz.funnyboy.gulimall.product.vo.AttrGroupWithAttrsVo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -38,6 +39,16 @@ public class AttrGroupController
 
     @Autowired
     private AttrAttrgroupRelationService attrAttrgroupRelationService;
+
+    @GetMapping("/{catelogId}/withattr")
+    public R getAttrGroupWithAttrs(
+            @PathVariable("catelogId")
+                    Long catelogId) {
+        List<AttrGroupWithAttrsVo> list = attrGroupService.getAttrGroupWithAttrsByCatelogId(catelogId);
+        return R
+                .ok()
+                .put("data", list);
+    }
 
     /**
      * 根据属性分组获取关联属性

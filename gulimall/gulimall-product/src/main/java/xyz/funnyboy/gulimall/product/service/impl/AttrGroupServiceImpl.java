@@ -15,8 +15,10 @@ import xyz.funnyboy.gulimall.product.dao.AttrGroupDao;
 import xyz.funnyboy.gulimall.product.entity.AttrAttrgroupRelationEntity;
 import xyz.funnyboy.gulimall.product.entity.AttrGroupEntity;
 import xyz.funnyboy.gulimall.product.service.AttrGroupService;
+import xyz.funnyboy.gulimall.product.service.AttrService;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupRelationVo;
+import xyz.funnyboy.gulimall.product.vo.AttrGroupWithAttrsVo;
 
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +33,9 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
 
     @Autowired
     private AttrAttrgroupRelationDao attrAttrgroupRelationDao;
+
+    @Autowired
+    private AttrService attrService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -86,5 +91,19 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                 .collect(Collectors.toList());
         // 批量删除关联关系
         attrAttrgroupRelationDao.deleteBatchRelation(attrAttrgroupRelationEntityList);
+    }
+
+    @Override
+    public List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId) {
+        return baseMapper
+                .selectList(new LambdaQueryWrapper<AttrGroupEntity>().eq(AttrGroupEntity::getCatelogId, catelogId))
+                .stream()
+                .map(attrGroupEntity -> {
+                    AttrGroupWithAttrsVo attrGroupWithAttrsVo = new AttrGroupWithAttrsVo();
+                    BeanUtils.copyProperties(attrGroupEntity, attrGroupWithAttrsVo);
+                    attrGroupWithAttrsVo.setAttrs(attrService.getRelationAttr(attrGroupEntity.getAttrGroupId()));
+                    return attrGroupWithAttrsVo;
+                })
+                .collect(Collectors.toList());
     }
 }

@@ -3,7 +3,9 @@ package xyz.funnyboy.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.ProductAttrValueEntity;
+import xyz.funnyboy.gulimall.product.vo.BaseAttrs;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -17,5 +19,13 @@ public interface ProductAttrValueService extends IService<ProductAttrValueEntity
 {
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 保存基本属性
+     *
+     * @param spuId     SPU ID
+     * @param baseAttrs 基础属性
+     */
+    void saveBaseAttrs(Long spuId, List<BaseAttrs> baseAttrs);
 }
 

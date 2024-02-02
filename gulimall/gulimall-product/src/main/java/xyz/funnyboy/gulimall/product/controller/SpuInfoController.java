@@ -6,6 +6,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.entity.SpuInfoEntity;
 import xyz.funnyboy.gulimall.product.service.SpuInfoService;
+import xyz.funnyboy.gulimall.product.vo.SpuSaveVo;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -61,8 +62,8 @@ public class SpuInfoController
     // @RequiresPermissions("product:spuinfo:save")
     public R save(
             @RequestBody
-                    SpuInfoEntity spuInfo) {
-        spuInfoService.save(spuInfo);
+                    SpuSaveVo spuSaveVo) {
+        spuInfoService.saveSpuInfo(spuSaveVo);
 
         return R.ok();
     }

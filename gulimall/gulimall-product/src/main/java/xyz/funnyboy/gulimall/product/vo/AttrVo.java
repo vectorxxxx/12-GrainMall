@@ -3,6 +3,8 @@ package xyz.funnyboy.gulimall.product.vo;
 import lombok.Data;
 
 /**
+ * 属性
+ *
  * @author VectorX
  * @version V1.0
  * @date 2024-01-31 23:08:13
