@@ -1,0 +1,224 @@
+{
+    "spuName": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑",
+    "spuDescription": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑",
+    "catalogId": 225,
+    "brandId": 5,
+    "weight": 0.225,
+    "publishStatus": 0,
+    "decript": [
+        "https://gulimall-vectorx.oss-cn-shanghai.aliyuncs.com/2024-02-03/a3102cf3-1239-4c33-8d05-fd39d0833e7a_雅丹黑.png"
+    ],
+    "images": [
+        "https://gulimall-vectorx.oss-cn-shanghai.aliyuncs.com/2024-02-03/fee5a9e2-9933-424e-841b-b8096636dab6_雅丹黑.png"
+    ],
+    "bounds": {
+        "buyBounds": 100,
+        "growBounds": 100
+    },
+    "baseAttrs": [
+        {
+            "attrId": 10,
+            "attrValues": "2023-08-29",
+            "showDesc": 1
+        },
+        {
+            "attrId": 11,
+            "attrValues": "华为 Mate60 Pro",
+            "showDesc": 1
+        },
+        {
+            "attrId": 12,
+            "attrValues": "雅丹黑",
+            "showDesc": 1
+        },
+        {
+            "attrId": 13,
+            "attrValues": "225g",
+            "showDesc": 1
+        },
+        {
+            "attrId": 14,
+            "attrValues": "宽79mm；长163.65mm；厚8.1mm",
+            "showDesc": 1
+        },
+        {
+            "attrId": 15,
+            "attrValues": "NM存储卡",
+            "showDesc": 1
+        },
+        {
+            "attrId": 16,
+            "attrValues": "12GB",
+            "showDesc": 1
+        },
+        {
+            "attrId": 17,
+            "attrValues": "120Hz",
+            "showDesc": 1
+        },
+        {
+            "attrId": 18,
+            "attrValues": "昆仑玻璃",
+            "showDesc": 1
+        },
+        {
+            "attrId": 19,
+            "attrValues": "6.82英寸",
+            "showDesc": 1
+        },
+        {
+            "attrId": 20,
+            "attrValues": "5000mAh(typ)",
+            "showDesc": 1
+        },
+        {
+            "attrId": 21,
+            "attrValues": "50W",
+            "showDesc": 0
+        },
+        {
+            "attrId": 22,
+            "attrValues": "88W",
+            "showDesc": 0
+        },
+        {
+            "attrId": 23,
+            "attrValues": "HarmonyOS",
+            "showDesc": 0
+        },
+        {
+            "attrId": 24,
+            "attrValues": "未上市",
+            "showDesc": 0
+        },
+        {
+            "attrId": 25,
+            "attrValues": "支持",
+            "showDesc": 0
+        },
+        {
+            "attrId": 26,
+            "attrValues": "未上市",
+            "showDesc": 0
+        },
+        {
+            "attrId": 27,
+            "attrValues": "双卡双待",
+            "showDesc": 0
+        },
+        {
+            "attrId": 28,
+            "attrValues": "2个",
+            "showDesc": 0
+        },
+        {
+            "attrId": 29,
+            "attrValues": "人脸识别；屏幕指纹",
+            "showDesc": 0
+        },
+        {
+            "attrId": 30,
+            "attrValues": "1200万像素",
+            "showDesc": 0
+        },
+        {
+            "attrId": 31,
+            "attrValues": "4800万像素",
+            "showDesc": 0
+        },
+        {
+            "attrId": 32,
+            "attrValues": "1300万像素",
+            "showDesc": 0
+        },
+        {
+            "attrId": 33,
+            "attrValues": "\"手机（内置电池） x 1 华为SuperCharge充电器 X 1 USB Type-C 数据线 X 1 透明保护壳 x 1 快速指南 x 1 取卡针 x 1 保护膜（出厂贴在手机上） X 1 三包凭证 x 1 会员权益礼包 x 1\"",
+            "showDesc": 1
+        }
+    ],
+    "skus": [
+        {
+            "attr": [
+                {
+                    "attrId": 12,
+                    "attrName": "机身颜色",
+                    "attrValue": "雅丹黑"
+                },
+                {
+                    "attrId": 16,
+                    "attrName": "运行内存",
+                    "attrValue": "12GB"
+                }
+            ],
+            "skuName": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 雅丹黑 12GB",
+            "price": "6999",
+            "skuTitle": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 雅丹黑 12GB",
+            "skuSubtitle": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 雅丹黑 12GB",
+            "images": [
+                {
+                    "imgUrl": "https://gulimall-vectorx.oss-cn-shanghai.aliyuncs.com/2024-02-03/fee5a9e2-9933-424e-841b-b8096636dab6_雅丹黑.png",
+                    "defaultImg": 1
+                }
+            ],
+            "descar": [
+                "雅丹黑",
+                "12GB"
+            ],
+            "fullCount": 10,
+            "discount": 0.98,
+            "countStatus": 0,
+            "fullPrice": 10000,
+            "reducePrice": 100,
+            "priceStatus": 0,
+            "memberPrice": [
+                {
+                    "id": 2,
+                    "name": "钻石会员",
+                    "price": 6949
+                }
+            ]
+        },
+        {
+            "attr": [
+                {
+                    "attrId": 12,
+                    "attrName": "机身颜色",
+                    "attrValue": "乐臻版 雅丹黑"
+                },
+                {
+                    "attrId": 16,
+                    "attrName": "运行内存",
+                    "attrValue": "12GB"
+                }
+            ],
+            "skuName": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 乐臻版 雅丹黑 12GB",
+            "price": "7599",
+            "skuTitle": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 乐臻版 雅丹黑 12GB",
+            "skuSubtitle": "华为（HUAWEI）旗舰手机 Mate 60 Pro 12GB+512GB 雅丹黑 乐臻版 雅丹黑 12GB",
+            "images": [
+                {
+                    "imgUrl": "",
+                    "defaultImg": 0
+                }
+            ],
+            "descar": [
+                "乐臻版 雅丹黑",
+                "12GB"
+            ],
+            "fullCount": 0,
+            "discount": 0,
+            "countStatus": 0,
+            "fullPrice": 0,
+            "reducePrice": 0,
+            "priceStatus": 0,
+            "memberPrice": [
+                {
+                    "id": 2,
+                    "name": "钻石会员",
+                    "price": 0
+                }
+            ]
+        }
+    ]
+}

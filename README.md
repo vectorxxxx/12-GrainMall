@@ -1,4 +1,243 @@
-一、Linux 环境搭建
+# 分布式基础
+
+## 一、Demo 效果
+
+### 1、后台管理登录
+
+![image-20240203161758264](https://s2.loli.net/2024/02/03/X5gTfLB48NKoD7p.png)
+
+### 2、首页
+
+![image-20240203161936375](https://s2.loli.net/2024/02/03/YHXzKWRNfLvcOnC.png)
+
+### 3、商品系统
+
+#### 3.1、分类维护
+
+![image-20240203162031724](https://s2.loli.net/2024/02/03/Ur7AE2utgVB6Mke.png)
+
+![image-20240203162053912](https://s2.loli.net/2024/02/03/LpD4HPjiatx9hTI.png)
+
+#### 3.2、品牌管理
+
+![image-20240203162221864](https://s2.loli.net/2024/02/03/6sGw4ntMCobjyOK.png)
+
+![image-20240203162205897](https://s2.loli.net/2024/02/03/Q4VYrPft5RDc8dO.png)
+
+![image-20240203162244748](https://s2.loli.net/2024/02/03/BC6RPZVHKhvSEXI.png)
+
+#### 3.3、平台属性
+
+##### 3.3.1、属性分组
+
+![image-20240203162505275](https://s2.loli.net/2024/02/03/y78EN4WoixmXGMw.png)
+
+![image-20240203162528263](https://s2.loli.net/2024/02/03/9ZzGln7MEqgeupo.png)
+
+![image-20240203162553425](https://s2.loli.net/2024/02/03/zJoaMcdNOWDQteC.png)
+
+##### 3.3.2、规格参数
+
+![image-20240203162706175](https://s2.loli.net/2024/02/03/VtNpwYsRLU53Q2e.png)
+
+![image-20240203162752975](https://s2.loli.net/2024/02/03/9vXhQFebU5sEAtV.png)
+
+##### 3.3.3、销售属性
+
+![image-20240203162833998](https://s2.loli.net/2024/02/03/fRui6qY4pVXgZLM.png)
+
+![image-20240203162852563](https://s2.loli.net/2024/02/03/e5EYoW7bhOydPCJ.png)
+
+#### 3.4、商品维护
+
+##### 3.4.1、spu管理
+
+![image-20240203163011326](https://s2.loli.net/2024/02/03/VNCcMsv2mDFyuXQ.png)
+
+![image-20240203163036589](https://s2.loli.net/2024/02/03/iJgIy2zG7BmSbD1.png)
+
+##### 3.4.2、发布商品
+
+![image-20240203163219792](https://s2.loli.net/2024/02/03/qGPYmsSfRloizT2.png)
+
+![image-20240203163319268](https://s2.loli.net/2024/02/03/DK27CGdaoh1qXwy.png)
+
+![image-20240203163336801](https://s2.loli.net/2024/02/03/dJr1aEVkceb6nw4.png)
+
+![image-20240203163445525](https://s2.loli.net/2024/02/03/9fBPZzbEpTCwV57.png)
+
+![image-20240203163503264](https://s2.loli.net/2024/02/03/VrkDdbNtnMcKp7x.png)
+
+![image-20240203163519602](https://s2.loli.net/2024/02/03/xenByL41VfO8uh7.png)
+
+##### 3.4.3、商品管理
+
+![image-20240203163552416](https://s2.loli.net/2024/02/03/lJ7ufziyheFjLNv.png)
+
+### 4、库存系统
+
+#### 4.1、仓库维护
+
+![image-20240203163831726](https://s2.loli.net/2024/02/03/36kejOWuriH1GBU.png)
+
+![image-20240203163850340](https://s2.loli.net/2024/02/03/yea9kdQpLOm1Rj5.png)
+
+#### 4.2、商品库存
+
+![image-20240203163905016](https://s2.loli.net/2024/02/03/wTfmMqv4pVYCL7A.png)
+
+![image-20240203163923853](https://s2.loli.net/2024/02/03/mpxQrgGU1tNTn24.png)
+
+#### 4.3、采购单维护
+
+##### 4.3.1、采购需求
+
+![image-20240203163946991](https://s2.loli.net/2024/02/03/NbGL57ZJSPfX4sv.png)
+
+![image-20240203164007180](https://s2.loli.net/2024/02/03/NagmXry9EAhMeGU.png)
+
+![image-20240203164033516](https://s2.loli.net/2024/02/03/AZU2y9mbfaBIneR.png)
+
+##### 4.3.2、采购单
+
+![image-20240203164051566](https://s2.loli.net/2024/02/03/GD43LVFhrbmNs1B.png)
+
+![image-20240203164107417](https://s2.loli.net/2024/02/03/ZCdVW3MwgSODGsv.png)
+
+
+
+## 二、技术选型
+
+### 1、前端技术
+
+| 技术栈       | 版本      | 重点关注     |
+| ------------ | --------- | ------------ |
+| `ES6`        |           | 语法新特性   |
+| `Node.js`    | `10.14.2` | 基本命令     |
+| `Vue`        | `2.5.16`  | 指令、组件化 |
+| `Element UI` | `2.8.2`   | 常用组件     |
+| `Axios`      | `0.17.1`  | 基本请求     |
+
+### 2、后端技术
+
+| 技术栈                 | 版本             | 重点关注                                                     |
+| ---------------------- | ---------------- | ------------------------------------------------------------ |
+| `OpenJDK`              | `1.8.0_312`      |                                                              |
+| `Maven`                | `3.6.3`          |                                                              |
+| `Spring Boot`          | `2.2.2.RELEASE`  |                                                              |
+| `Spring Cloud`         | `Hoxton.RELEASE` | `OpenFeign` 远程方法的声明式调用<br/>`GateWay` 网关          |
+| `Spring Cloud Alibaba` | `2.2.0.RELEASE`  | `Nacos` 服务注册/发现、配置中心<br/>`OSS` 对象存储服务       |
+| `MyBatis Plus`         | `3.3.1`          |                                                              |
+| `人人开源`             | `master`         | `renren-fast` 快速开放平台<br/>`renren-fast-vue` 后台管理前端<br/>`renren-generator` 代码生成器 |
+
+**Spring Cloud Alibaba、Spring Cloud、Spring Boot 版本选择**
+
+参考文档：[毕业版本依赖关系(推荐使用)](https://developer.aliyun.com/article/876964)
+
+| Spring Cloud Alibaba Version      | Spring Cloud Version                | Spring Boot Version   |
+| --------------------------------- | ----------------------------------- | --------------------- |
+| 2021.0.1.0                        | Spring Cloud 2021.0.1               | 2.6.3                 |
+| 2.2.7.RELEASE                     | Spring Cloud Hoxton.SR12            | 2.3.12.RELEASE        |
+| 2021.1                            | Spring Cloud 2020.0.1               | 2.4.2                 |
+| 2.2.6.RELEASE                     | Spring Cloud Hoxton.SR9             | 2.3.2.RELEASE         |
+| 2.1.4.RELEASE                     | Spring Cloud Greenwich.SR6          | 2.1.13.RELEASE        |
+| 2.2.1.RELEASE                     | Spring Cloud Hoxton.SR3             | 2.2.5.RELEASE         |
+| ==**2.2.0.RELEASE**==             | ==**Spring Cloud Hoxton.RELEASE**== | ==**2.2.X.RELEASE**== |
+| 2.1.2.RELEASE                     | Spring Cloud Greenwich              | 2.1.X.RELEASE         |
+| 2.0.4.RELEASE(停止维护，建议升级) | Spring Cloud Finchley               | 2.0.X.RELEASE         |
+| 1.5.1.RELEASE(停止维护，建议升级) | Spring Cloud Edgware                | 1.5.X.RELEASE         |
+
+### 3、数据库技术
+
+| 技术栈  | 版本                                                     |
+| ------- | -------------------------------------------------------- |
+| `MySQL` | 数据库版本：`5.7`<br/>mysql-connector-java版本：`8.0.17` |
+| `Redis` | `6.2.6`                                                  |
+
+### 4、运维技术
+
+| 技术栈    | 版本         | 重点关注 |
+| --------- | ------------ | -------- |
+| `Vagrant` | `2.4.1`      | 基本命令 |
+| `Linux`   | `CentOS-7.1` | 常用命令 |
+| `Docker`  | `25.0.1`     | 常用命令 |
+
+### 5、开发工具
+
+| 软件            | 版本           | 备注            |
+| --------------- | -------------- | --------------- |
+| `IntelliJ IDEA` | `2021.1.3`     | Java开发环境    |
+| `WebStorm`      | `2021.1.3`     | 前端开发环境    |
+| `DataGrip`      | `2021.1.3`     | 数据库连接工具  |
+| `VS Code`       | `1.86.0`       | 多功能编辑器    |
+| `Typora`        | `1.0.3(beta)`  | Markdown 编辑器 |
+| `VirtualBox`    | `7.0.14`       | 虚拟机          |
+| `SQLyog`        | `v10.00 Beta1` | 数据库连接工具  |
+| `PowerDesigner` | `16.5`         | 数据库设计工具  |
+
+
+
+## 三、项目结构
+
+### 1、前端结构层次
+
+```
+renren-fast-vue
+ ├── .babelrc
+ ├── .editorconfig
+ ├── .eslintignore
+ ├── .eslintrc.js
+ ├── .gitignore
+ ├── .postcssrc.js
+ ├── build
+ ├── config
+ ├── gulpfile.js
+ ├── index.html
+ ├── node_modules
+ ├── package-lock.json
+ ├── package.json
+ ├── src
+ │   ├── App.vue
+ │   ├── assets
+ │   ├── components
+ │   ├── main.js
+ │   ├── mock
+ │   ├── router
+ │   ├── store
+ │   ├── utils
+ │   └── views
+ │       └── modules
+ │           ├── common
+ │           ├── job
+ │           ├── member
+ │           ├── oss
+ │           ├── product
+ │           ├── sys
+ │           └── ware
+ └── static
+     └── config
+         └── index.js
+```
+
+### 2、后端结构层次
+
+```
+gulimall
+ ├── gulimall-common
+ ├── gulimall-coupon
+ ├── gulimall-gateway
+ ├── gulimall-member
+ ├── gulimall-order
+ ├── gulimall-product
+ ├── gulimall-third-party
+ ├── gulimall-ware
+ ├── renren-fast
+ └── renren-generator
+```
+
+
+
+## 四、Linux 环境搭建
 
 ### 1、安装 Vagrant
 
@@ -210,6 +449,9 @@ docker run -p 6379:6379 --name redis \
 -d redis \
 redis-server /etc/redis/redis.conf
 
+# 查看 redis 版本
+docker exec -it redis redis-server -v
+
 # 使用 redis 镜像执行 redis-cli 命令连接
 docker exec -it redis redis-cli
 
@@ -226,25 +468,4 @@ docker update mysql --restart=always
 # Redis 容器自启动
 docker update redis --restart=always
 ```
-
-
-
-## 二、开发环境搭建
-
-### 1、Spring Cloud Alibaba、Spring Cloud、Spring Boot 版本选择
-
-参考文档：[毕业版本依赖关系(推荐使用)](https://developer.aliyun.com/article/876964)
-
-| Spring Cloud Alibaba Version      | Spring Cloud Version                | Spring Boot Version   |
-| --------------------------------- | ----------------------------------- | --------------------- |
-| 2021.0.1.0                        | Spring Cloud 2021.0.1               | 2.6.3                 |
-| 2.2.7.RELEASE                     | Spring Cloud Hoxton.SR12            | 2.3.12.RELEASE        |
-| 2021.1                            | Spring Cloud 2020.0.1               | 2.4.2                 |
-| 2.2.6.RELEASE                     | Spring Cloud Hoxton.SR9             | 2.3.2.RELEASE         |
-| 2.1.4.RELEASE                     | Spring Cloud Greenwich.SR6          | 2.1.13.RELEASE        |
-| 2.2.1.RELEASE                     | Spring Cloud Hoxton.SR3             | 2.2.5.RELEASE         |
-| ==**2.2.0.RELEASE**==             | ==**Spring Cloud Hoxton.RELEASE**== | ==**2.2.X.RELEASE**== |
-| 2.1.2.RELEASE                     | Spring Cloud Greenwich              | 2.1.X.RELEASE         |
-| 2.0.4.RELEASE(停止维护，建议升级) | Spring Cloud Finchley               | 2.0.X.RELEASE         |
-| 1.5.1.RELEASE(停止维护，建议升级) | Spring Cloud Edgware                | 1.5.X.RELEASE         |
 
