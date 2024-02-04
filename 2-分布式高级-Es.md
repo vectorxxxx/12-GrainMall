@@ -1,3 +1,5 @@
+[toc]
+
 # ElasticSearch
 
 ## 一、Docker 安装 Es
