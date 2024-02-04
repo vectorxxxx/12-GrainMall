@@ -1,0 +1,511 @@
+# 初步检索
+## _cat
+### nodes（查看所有节点）
+GET _cat/nodes
+### master（查看主节点）
+GET _cat/master
+### health（查看健康状况）
+GET _cat/health
+### indices（查看所有索引）
+GET _cat/indices
+
+
+## 索引一个文档（保存）
+### PUT 请求（指定 ID）
+PUT customer/external/1
+{
+    "name": "John Doe"
+}
+### PUT 请求（不指定 ID）
+PUT customer/external
+{
+    "name": "John Doe"
+}
+### POST 请求（指定ID）
+POST customer/external/3
+{
+    "name": "John Doe"
+}
+### POST 请求（不指定ID）
+POST customer/external
+{
+    "name": "John Doe"
+}
+
+
+## 查询文档
+GET customer/external/1
+### 乐观锁
+PUT customer/external/1?if_seq_no=4&if_primary_term=1
+{
+    "name": "John Doe 4"
+}
+
+
+## 更新文档
+### 不增加属性
+POST http://192.168.56.10:9200/customer/external/1/_update
+{
+    "doc": {
+        "name": "John Doew"
+    }
+}
+### 增加属性
+POST customer/external/1/_update
+{
+    "doc": {
+        "name": "Jane Doe",
+        "age": 20
+    }
+}
+
+
+## 删除文档 & 删除索引
+### 删除文档
+DELETE customer/external/1
+### 删除索引
+DELETE customer
+
+
+## 批量操作
+### 简单示例
+POST customer/external/_bulk
+{"index":{"_id":"1"}}
+{"name": "John Doe" }
+{"index":{"_id":"2"}}
+{"name": "Jane Doe" }
+### 复杂示例
+POST /_bulk
+{ "delete": { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "create": { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "title": "My first blog post" }
+{ "index": { "_index": "website", "_type": "blog" }}
+{ "title": "My second blog post" }
+{ "update": { "_index": "website", "_type": "blog", "_id": "123" }}
+{ "doc" : {"title" : "My updated blog post"}}
+
+
+# 进阶检索
+## 检索信息
+### 检索所有信息
+GET bank/_search
+### 请求参数检索
+GET bank/_search?q=*&sort=account_number:asc
+### uri+请求体检索
+GET bank/_search
+{
+    "query": {
+        "match_all": {}
+    },
+    "sort": [
+        {
+            "account_number": {
+                "order": "desc"
+            }
+        }
+    ]
+}
+
+
+## Query DSL
+### 基本语法格式
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 5,
+  "sort": [
+    {
+      "balance": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+### 返回部分字段
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "from": 0,
+  "size": 5,
+  "_source": ["age", "balance"]
+}
+### match（匹配查询）
+#### 基本类型（非字符串），精确匹配
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "account_number": "20"
+    }
+  }
+}
+#### 字符串，全文检索
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "mill"
+    }
+  }
+}
+#### 字符串，多个单词（分词 + 全文检索）
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "mill road"
+    }
+  }
+}
+#### match_phrase（短语匹配）
+GET bank/_search
+{
+  "query": {
+    "match_phrase": {
+      "address": "mill road"
+    }
+  }
+}
+#### multi_match（多字段匹配）
+GET bank/_search
+{
+  "query": {
+    "multi_match": {
+      "query": "mill",
+      "fields": ["state", "address"]
+    }
+  }
+}
+#### bool（复合查询）
+##### must
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
+        },
+        {
+          "match": {
+            "gender": "M"
+          }
+        }
+      ]
+    }
+  }
+}
+##### should
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
+        },
+        {
+          "match": {
+            "gender": "M"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "address": "lane"
+          }
+        }
+      ]
+    }
+  }
+}
+##### must_not
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
+        },
+        {
+          "match": {
+            "gender": "M"
+          }
+        }
+      ],
+      "should": [
+        {
+          "match": {
+            "address": "lane"
+          }
+        }
+      ],
+      "must_not": [
+        {
+          "match": {
+            "email": "baluba.com"
+          }
+        }
+      ]
+    }
+  }
+}
+#### filter（结果过滤）
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "match": {
+            "address": "mill"
+          }
+        }
+      ],
+      "filter": {
+        "range": {
+          "balance": {
+            "gte": 10000,
+            "lte": 20000
+          }
+        }
+      }
+    }
+  }
+}
+#### term
+GET bank/_search
+{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "term": {
+            "age": {
+              "value": "28"
+            }
+          }
+        },
+        {
+          "match": {
+            "address": "990 Mill Road"
+          }
+        }
+      ]
+    }
+  }
+}
+#### aggregations（执行聚合）
+##### 1、搜索 address 中包含 mill 的所有人的年龄分布以及平均年龄，但不显示这些人的详情。
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "mill"
+    }
+  },
+  "aggs": {
+    "group_by_state": {
+      "terms": {
+        "field": "age"
+      }
+    },
+    "avg_state": {
+      "avg": {
+        "field": "age"
+      }
+    }
+  },
+  "size": 0
+}
+##### 2、按照年龄聚合，并且请求这些年龄段的这些人的平均薪资
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "age_avg": {
+      "terms": {
+        "field": "age",
+        "size": 1000
+      },
+      "aggs": {
+        "balances_avg": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  },
+  "size": 1000
+}
+##### 3、查出所有年龄分布，并且这些年龄段中 M 的平均薪资和 F 的平均薪资以及这个年龄段的总体平均薪资
+GET bank/_search
+{
+  "query": {
+    "match_all": {}
+  },
+  "aggs": {
+    "age_avg": {
+      "terms": {
+        "field": "age",
+        "size": 100
+      },
+      "aggs": {
+        "gender_agg": {
+          "terms": {
+            "field": "gender.keyword",
+            "size": 100
+          },
+          "aggs": {
+            "balance_avg": {
+              "avg": {
+                "field": "balance"
+              }
+            }
+          }
+        },
+        "balance_agg": {
+          "avg": {
+            "field": "balance"
+          }
+        }
+      }
+    }
+  },
+  "size": 0
+}
+
+
+## Mapping
+### 查看 mapping 信息
+GET bank/_mapping
+### 创建映射
+PUT /my-index
+{
+  "mappings": {
+    "properties": {
+      "age": {
+        "type": "integer"
+      },
+      "email": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "text"
+      }
+    }
+  }
+}
+### 添加新的字段映射
+PUT /my-index/_mapping
+{
+  "properties": {
+    "employee-id": {
+      "type": "keyword",
+      "index": false
+    }
+  }
+}
+### 查看 mapping 信息
+GET /my-index/_mapping
+### 数据迁移
+#### 1、查询老的索引 bank 的映射
+GET /bank/_mapping
+#### 2、创建新的索引 newbank 的映射
+PUT /newbank
+{
+  "mappings": {
+    "properties": {
+      "account_number": {
+        "type": "long"
+      },
+      "address": {
+        "type": "text"
+      },
+      "age": {
+        "type": "integer"
+      },
+      "balance": {
+        "type": "long"
+      },
+      "city": {
+        "type": "keyword"
+      },
+      "email": {
+        "type": "keyword"
+      },
+      "employer": {
+        "type": "keyword"
+      },
+      "firstname": {
+        "type": "text"
+      },
+      "gender": {
+        "type": "keyword"
+      },
+      "lastname": {
+        "type": "text",
+        "fields": {
+          "keyword": {
+            "type": "keyword",
+            "ignore_above": 256
+          }
+        }
+      },
+      "state": {
+        "type": "keyword"
+      }
+    }
+  }
+}
+#### 3、查询老的索引 bank 的 _type 字段
+GET bank/_search
+{
+    "query": {
+        "match_all": {}
+    },
+    "size": 1
+}
+#### 4、数据迁移
+POST _reindex
+{
+  "source": {
+    "index": "bank",
+    "type": "accout"
+  },
+  "dest": {
+    "index": "newbank"
+  }
+}
+
+
+## 分词
+POST _analyze
+{
+  "tokenizer": "standard",
+  "text": "The 2 QUICK Brown-Foxes jumped over the lazy dog's bone."
+}
+
+POST _analyze
+{
+  "tokenizer": "standard",
+  "text": "尚硅谷电商项目"
+}
+
+
