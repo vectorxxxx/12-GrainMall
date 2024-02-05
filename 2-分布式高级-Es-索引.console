@@ -508,4 +508,25 @@ POST _analyze
   "text": "尚硅谷电商项目"
 }
 
+## 测试分词器
+POST _analyze
+{
+  "text": "我是中国人"
+}
+POST _analyze
+{
+  "analyzer": "ik_smart", 
+  "text": "我是中国人"
+}
+POST _analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "我是中国人"
+}
 
+## 自定义词库
+POST _analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "姬霓太美你干嘛哇贞德食泥鸭哪李贵啦拱出去你把人给笑拥了这是一个lonely的问题尊嘟假嘟泰裤辣黄龙江一带全都带蓝牙你算是提到棉花啦"
+}

@@ -46,7 +46,9 @@ docker update elasticsearch --restart=always
 docker restart elasticsearch
 ```
 
-postman 测试1（以下所有的 192.168.56.10 换成自己虚拟机中 Linux 对应的 IP 就行）
+==以下所有的 192.168.56.10 换成自己的 Linux 对应 IP 就行==
+
+postman 测试1
 
 ```
 GET http://192.168.56.10:9200
@@ -4155,4 +4157,651 @@ POST _analyze
 </code></pre></details>
 
 能够看出不同的分词器，分词有明显的区别，所以以后定义一个索引不能再使用默认的 mapping 了，要手工建立 mapping, 因为要选择分词器。
+
+#### 4.3、自定义词库
+
+##### 4.3.1、调整 linux 内存大小
+
+```bash
+# 查看内存是否足够
+free -m
+```
+
+<details><summary><font size="3" color="orange">输出结果</font></summary> 
+<pre><code class="language-json">              total        used        free      shared  buff/cache   available
+Mem:            486         396           5           0          85          77
+Swap:          2047         844        1203
+</code></pre></details>
+
+发现可用内存只剩 77M，需要调整下 Virtual Box 虚拟机的内存大小，以保留足够的内存空间方便后面安装 Nginx
+
+```bash
+# 关闭 vagrant（也可以直接通过 Virtual Box 进行关机操作）
+vagrant halt
+```
+
+等待关闭成功后，打开 Virtual Box 设置--系统，根据电脑实际情况调整内存大小（这里我调整为 4096M）
+
+![image-20240205190514181](https://s2.loli.net/2024/02/05/cyAEhzTCZklqrmB.png)
+
+```bash
+# 重启 vagrant（也可以直接通过 Virtual Box 进行开机操作）
+vagrant up
+
+# 等待启动成功后，进入 vagrant（也可以通过 xhell 等远程工具连接）
+vagrant ssh
+
+# 再次查看下可用内存大小
+free -m
+```
+
+<details><summary><font size="3" color="orange">输出结果</font></summary> 
+<pre><code class="language-json">              total        used        free      shared  buff/cache   available
+Mem:           3789        1156        1806           8         825        2387
+Swap:          2047           0        2047
+</code></pre></details>
+
+`available` 为 2387M，OK！
+
+##### 4.3.2、重装 Es
+
+由于我之前安装 elasticsearch 时设置的最大内存就是 512M，所以这里不做调整了，只记录下老师视频中的基本命令，加深下印象，需要重装时可做参考
+
+> 之前创建 elasticsearch 时已将 config、data、plugins 等文件夹挂载到 linux 中了，所以无需过多顾虑数据丢失问题
+
+```bash
+# 停止 elasticsearch 容器
+docker stop elasticsearch
+
+# 删除 elasticsearch 容器
+docker rm elasticsearch
+
+# 运行 elasticsearch 实例
+docker run --name elasticsearch -p 9200:9200 -p 9300:9300 \
+-e "discovery.type=single-node" \
+-e ES_JAVA_OPTS="-Xms64m -Xmx512m" \
+-v /mydata/elasticsearch/config/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml \
+-v /mydata/elasticsearch/data:/usr/share/elasticsearch/data \
+-v /mydata/elasticsearch/plugins:/usr/share/elasticsearch/plugins \
+-d elasticsearch:7.4.2
+
+# 查看 elasticsearch 运行状态
+docker ps
+
+# 设置 elasticsearch 自启动
+docker update elasticsearch --restart=always
+```
+
+##### 4.3.3、安装 Nginx
+
+```bash
+# 在 mydata 下创建 nginx 目录
+cd /mydata
+mkdir nignx
+
+# 随便启动一个 nginx 实例，这一步只是为了复制出配置，后面会删掉重装
+# 这里及时 docker 容器中没有拉取过 Nginx 容器也不用担心，因为 docker 会自动拉取并运行
+docker run -p 80:80 --name nginx -d nginx:1.10
+
+# 将 nginx 容器内的 /etc/nginx 配置文件拷贝到当前目录(.)，注意别忘了后面的点（代表当前目录）！！！
+docker container cp nginx:/etc/nginx .
+
+# 停止并移除 nginx 容器
+docker stop nginx
+docker rm nginx
+
+# 修改目录名称
+cd ..
+mv nginx conf
+# 创建 nginx 目录
+mkdir nginx
+# 将 conf 目录移动到 /mydata/nginx 下
+mv conf/ nginx/
+
+# 创建新的 nginx
+docker run -p 80:80 --name nginx \
+-v /mydata/nginx/html:/usr/share/nginx/html \
+-v /mydata/nginx/logs:/var/log/nginx \
+-v /mydata/nginx/conf:/etc/nginx \
+-d nginx:1.10
+
+# 访问测试，如下图即为安装成功
+http://192.168.56.10/
+```
+
+![image-20240205194627317](https://s2.loli.net/2024/02/05/o1sRbmCTHEvgU2h.png)
+
+```bash
+# 在 /mydata/nginx/html 下新建一个 index.html 随便编辑点 HTML 进行测试
+vi /mydata/nginx/html/index.html
+
+# 再次访问
+http://192.168.56.10/
+```
+
+![image-20240205195342388](https://s2.loli.net/2024/02/05/2UOCXMADLqexw6n.png)
+
+##### 4.3.4、配置分词文件
+
+```bash
+# 在 /mydata/nginx/html 下新建一个 es 文件夹，编辑一个文件 fenci.txt，用来存放 Es 自定义词库
+mkdir /mydata/nginx/html/es
+vi /mydata/nginx/html/es/fenci.txt
+# 一行一个词，如下：
+```
+
+<details><summary><font size="3" color="orange">自定义词库</font></summary> 
+<pre><code class="language-txt">姬霓太美
+你干嘛
+贞德食泥鸭
+松果糖豆闪电鞭
+哪李贵啦
+敌蜜
+iPhone手机
+拱出去
+笑拥了
+lonely的问题
+尊嘟假嘟
+泰裤辣
+黄龙江一带全都带蓝牙
+你算是踢到棉花啦
+</code></pre></details>
+
+
+```bash
+# 访问验证，会出现乱码数据，可以先不用管
+http://192.168.56.10/es/fenci.txt
+```
+
+<details><summary><font size="3" color="orange">访问结果</font></summary> 
+<pre><code class="language-txt">濮湏澶編
+浣犲共鍢�
+璐炲痉椋熸偿楦�
+鏉炬灉绯栬眴闂數闉�
+鍝潕璐靛暒
+鏁岃湝
+iPhone鎵嬫満
+鎷卞嚭鍘�
+绗戞嫢浜�
+lonely鐨勯棶棰�
+灏婂槦鍋囧槦
+娉拌￥杈�
+榛勯緳姹熶竴甯﹀叏閮藉甫钃濈墮
+浣犵畻鏄涪鍒版鑺卞暒
+</code></pre></details>
+
+##### 4.3.6、配置远程扩展字典
+
+```bash
+# 修改 ik 分词器的配置文件
+vi /mydata/elasticsearch/plugins/ik/config/IKAnalyzer.cfg.xml
+```
+
+修改 `<entry key="remote_ext_dict">` 节点下的内容为我们上述的测试地址 `http://192.168.56.10/es/fenci.txt`
+
+==<u>**！！！注意：注释一定要打开**</u>==
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <comment>IK Analyzer 扩展配置</comment>
+    <!--用户可以在这里配置自己的扩展字典 -->
+    <entry key="ext_dict"></entry>
+    <!--用户可以在这里配置自己的扩展停止词字典-->
+    <entry key="ext_stopwords"></entry>
+    <!--用户可以在这里配置远程扩展字典 -->
+    <entry key="remote_ext_dict">http://192.168.56.10/es/fenci.txt</entry>
+    <!--用户可以在这里配置远程扩展停止词字典-->
+    <!-- <entry key="remote_ext_stopwords">words_location</entry> -->
+</properties>
+```
+
+配置完成后，重启 Es 容器
+
+```bash
+docker restart elasticsearch
+```
+
+##### 4.3.6、Kibana Console 测试
+
+```bash
+POST _analyze
+{
+  "analyzer": "ik_max_word",
+  "text": "姬霓太美你干嘛哇贞德食泥鸭哪李贵啦拱出去你把人给笑拥了这是一个lonely的问题尊嘟假嘟泰裤辣黄龙江一带全都带蓝牙你算是踢到棉花啦"
+}
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-json">{
+  "tokens" : [
+    {
+      "token" : "姬霓太美",
+      "start_offset" : 0,
+      "end_offset" : 4,
+      "type" : "CN_WORD",
+      "position" : 0
+    },
+    {
+      "token" : "太美",
+      "start_offset" : 2,
+      "end_offset" : 4,
+      "type" : "CN_WORD",
+      "position" : 1
+    },
+    {
+      "token" : "你干嘛",
+      "start_offset" : 4,
+      "end_offset" : 7,
+      "type" : "CN_WORD",
+      "position" : 2
+    },
+    {
+      "token" : "干嘛",
+      "start_offset" : 5,
+      "end_offset" : 7,
+      "type" : "CN_WORD",
+      "position" : 3
+    },
+    {
+      "token" : "哇",
+      "start_offset" : 7,
+      "end_offset" : 8,
+      "type" : "CN_CHAR",
+      "position" : 4
+    },
+    {
+      "token" : "贞德食泥鸭",
+      "start_offset" : 8,
+      "end_offset" : 13,
+      "type" : "CN_WORD",
+      "position" : 5
+    },
+    {
+      "token" : "贞德",
+      "start_offset" : 8,
+      "end_offset" : 10,
+      "type" : "CN_WORD",
+      "position" : 6
+    },
+    {
+      "token" : "食",
+      "start_offset" : 10,
+      "end_offset" : 11,
+      "type" : "CN_CHAR",
+      "position" : 7
+    },
+    {
+      "token" : "泥",
+      "start_offset" : 11,
+      "end_offset" : 12,
+      "type" : "CN_CHAR",
+      "position" : 8
+    },
+    {
+      "token" : "鸭",
+      "start_offset" : 12,
+      "end_offset" : 13,
+      "type" : "CN_CHAR",
+      "position" : 9
+    },
+    {
+      "token" : "哪李贵啦",
+      "start_offset" : 13,
+      "end_offset" : 17,
+      "type" : "CN_WORD",
+      "position" : 10
+    },
+    {
+      "token" : "拱出去",
+      "start_offset" : 17,
+      "end_offset" : 20,
+      "type" : "CN_WORD",
+      "position" : 11
+    },
+    {
+      "token" : "拱出",
+      "start_offset" : 17,
+      "end_offset" : 19,
+      "type" : "CN_WORD",
+      "position" : 12
+    },
+    {
+      "token" : "出去",
+      "start_offset" : 18,
+      "end_offset" : 20,
+      "type" : "CN_WORD",
+      "position" : 13
+    },
+    {
+      "token" : "你",
+      "start_offset" : 20,
+      "end_offset" : 21,
+      "type" : "CN_CHAR",
+      "position" : 14
+    },
+    {
+      "token" : "把",
+      "start_offset" : 21,
+      "end_offset" : 22,
+      "type" : "CN_CHAR",
+      "position" : 15
+    },
+    {
+      "token" : "人",
+      "start_offset" : 22,
+      "end_offset" : 23,
+      "type" : "CN_CHAR",
+      "position" : 16
+    },
+    {
+      "token" : "给",
+      "start_offset" : 23,
+      "end_offset" : 24,
+      "type" : "CN_CHAR",
+      "position" : 17
+    },
+    {
+      "token" : "笑拥了",
+      "start_offset" : 24,
+      "end_offset" : 27,
+      "type" : "CN_WORD",
+      "position" : 18
+    },
+    {
+      "token" : "这是",
+      "start_offset" : 27,
+      "end_offset" : 29,
+      "type" : "CN_WORD",
+      "position" : 19
+    },
+    {
+      "token" : "一个",
+      "start_offset" : 29,
+      "end_offset" : 31,
+      "type" : "CN_WORD",
+      "position" : 20
+    },
+    {
+      "token" : "一",
+      "start_offset" : 29,
+      "end_offset" : 30,
+      "type" : "TYPE_CNUM",
+      "position" : 21
+    },
+    {
+      "token" : "个",
+      "start_offset" : 30,
+      "end_offset" : 31,
+      "type" : "COUNT",
+      "position" : 22
+    },
+    {
+      "token" : "lonely的问题",
+      "start_offset" : 31,
+      "end_offset" : 40,
+      "type" : "CN_WORD",
+      "position" : 23
+    },
+    {
+      "token" : "lonely",
+      "start_offset" : 31,
+      "end_offset" : 37,
+      "type" : "ENGLISH",
+      "position" : 24
+    },
+    {
+      "token" : "的",
+      "start_offset" : 37,
+      "end_offset" : 38,
+      "type" : "CN_CHAR",
+      "position" : 25
+    },
+    {
+      "token" : "问题",
+      "start_offset" : 38,
+      "end_offset" : 40,
+      "type" : "CN_WORD",
+      "position" : 26
+    },
+    {
+      "token" : "尊嘟假嘟",
+      "start_offset" : 40,
+      "end_offset" : 44,
+      "type" : "CN_WORD",
+      "position" : 27
+    },
+    {
+      "token" : "泰裤辣",
+      "start_offset" : 44,
+      "end_offset" : 47,
+      "type" : "CN_WORD",
+      "position" : 28
+    },
+    {
+      "token" : "黄龙江一带全都带蓝牙",
+      "start_offset" : 47,
+      "end_offset" : 57,
+      "type" : "CN_WORD",
+      "position" : 29
+    },
+    {
+      "token" : "黄龙",
+      "start_offset" : 47,
+      "end_offset" : 49,
+      "type" : "CN_WORD",
+      "position" : 30
+    },
+    {
+      "token" : "龙江",
+      "start_offset" : 48,
+      "end_offset" : 50,
+      "type" : "CN_WORD",
+      "position" : 31
+    },
+    {
+      "token" : "一带",
+      "start_offset" : 50,
+      "end_offset" : 52,
+      "type" : "CN_WORD",
+      "position" : 32
+    },
+    {
+      "token" : "一",
+      "start_offset" : 50,
+      "end_offset" : 51,
+      "type" : "TYPE_CNUM",
+      "position" : 33
+    },
+    {
+      "token" : "带",
+      "start_offset" : 51,
+      "end_offset" : 52,
+      "type" : "CN_CHAR",
+      "position" : 34
+    },
+    {
+      "token" : "全都",
+      "start_offset" : 52,
+      "end_offset" : 54,
+      "type" : "CN_WORD",
+      "position" : 35
+    },
+    {
+      "token" : "带",
+      "start_offset" : 54,
+      "end_offset" : 55,
+      "type" : "CN_CHAR",
+      "position" : 36
+    },
+    {
+      "token" : "蓝牙",
+      "start_offset" : 55,
+      "end_offset" : 57,
+      "type" : "CN_WORD",
+      "position" : 37
+    },
+    {
+      "token" : "你算是踢到棉花啦",
+      "start_offset" : 57,
+      "end_offset" : 65,
+      "type" : "CN_WORD",
+      "position" : 38
+    },
+    {
+      "token" : "算是",
+      "start_offset" : 58,
+      "end_offset" : 60,
+      "type" : "CN_WORD",
+      "position" : 39
+    },
+    {
+      "token" : "踢到",
+      "start_offset" : 60,
+      "end_offset" : 62,
+      "type" : "CN_WORD",
+      "position" : 40
+    },
+    {
+      "token" : "棉花",
+      "start_offset" : 62,
+      "end_offset" : 64,
+      "type" : "CN_WORD",
+      "position" : 41
+    },
+    {
+      "token" : "啦",
+      "start_offset" : 64,
+      "end_offset" : 65,
+      "type" : "CN_CHAR",
+      "position" : 42
+    }
+  ]
+}
+</code></pre></details>
+
+
+
+## 五、Elasticsearch-Rest-Client
+
+这里只简单介绍下 Elasticsearch 的相关依赖和配置，其他无关的不做讲解
+
+### 1、添加依赖
+
+修改 gulimall 工程的 `pom.xml`，添加 `elasticsearch-rest-high-level-client` 相关的版本仲裁
+
+```xml
+<properties>
+    <!-- spring-boot-dependencies 中定义了 elasticsearch 版本为 6.8.5，需要进行修改 -->
+    <elasticsearch.version>7.4.2</elasticsearch.version>
+</properties>
+
+<dependencyManagement>
+    <dependencies>
+        <!-- ... -->
+        <!-- es -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-high-level-client</artifactId>
+            <version>${elasticsearch.version}</version>
+            <!-- 虽然修改了 elasticsearch 版本，但是没有生效，这里直接排除再重新指定 elasticsearch 和 elasticsearch-rest-client 的版本 -->
+            <exclusions>
+                <exclusion>
+                    <groupId>org.elasticsearch</groupId>
+                    <artifactId>elasticsearch</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.elasticsearch.client</groupId>
+                    <artifactId>elasticsearch-rest-client</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- 指定 elasticsearch 的版本 -->
+        <dependency>
+            <groupId>org.elasticsearch</groupId>
+            <artifactId>elasticsearch</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <!-- 指定 elasticsearch-rest-client 的版本 -->
+        <dependency>
+            <groupId>org.elasticsearch.client</groupId>
+            <artifactId>elasticsearch-rest-client</artifactId>
+            <version>${elasticsearch.version}</version>
+        </dependency>
+        <!-- ... -->
+    </dependencies>
+</dependencyManagement>
+```
+
+在 gulimall-search 工程的 `pom.xml` 中添加 Elasticsearch 的相关依赖
+
+```xml
+<dependencies>
+    <!-- ... -->
+    <!-- es -->
+    <dependency>
+        <groupId>org.elasticsearch.client</groupId>
+        <artifactId>elasticsearch-rest-high-level-client</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.elasticsearch</groupId>
+        <artifactId>elasticsearch</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.elasticsearch.client</groupId>
+        <artifactId>elasticsearch-rest-client</artifactId>
+    </dependency>
+    <!-- ... -->
+</dependencies>
+```
+
+### 2、添加配置类
+
+```java
+@Configuration
+public class GulimallElasticSearchConfig
+{
+    private static final String HOSTNAME = "192.168.56.10";
+    private static final int PORT = 9200;
+    private static final String SCHEME = "http";
+
+    /**
+     * 返回一个 Elasticsearch-Rest-Client
+     *
+     * @return {@link RestHighLevelClient}
+     */
+    @Bean
+    public RestHighLevelClient esRestClient() {
+        // hostname – the hostname (IP or DNS name)
+        // port – the port number. -1 indicates the scheme default port.
+        // scheme – the name of the scheme. null indicates the default scheme
+        final HttpHost httpHost = new HttpHost(HOSTNAME, PORT, SCHEME);
+
+        // Returns a new RestClientBuilder to help with RestClient creation. Creates a new builder instance and sets the nodes that the client will send requests to.
+        // You can use this if you do not have metadata up front about the nodes. If you do, prefer builder(Node...).
+        final RestClientBuilder builder = RestClient.builder(httpHost);
+
+        // Creates a RestHighLevelClient given the high level RestClientBuilder that allows to build the RestClient to be used to perform requests.
+        return new RestHighLevelClient(builder);
+    }
+}
+```
+
+### 3、单元测试
+
+```java
+@SpringBootTest
+public class GulimallSearchTests
+{
+    @Autowired
+    private RestHighLevelClient restHighLevelClient;
+
+    @Test
+    public void contextLoads() {
+        System.out.println(restHighLevelClient);
+        // org.elasticsearch.client.RestHighLevelClient@3fc7c734
+    }
+}
+```
 
