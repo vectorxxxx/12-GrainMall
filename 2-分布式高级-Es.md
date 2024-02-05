@@ -4774,21 +4774,29 @@ public class GulimallElasticSearchConfig
     @Bean
     public RestHighLevelClient esRestClient() {
         // hostname – the hostname (IP or DNS name)
+        // hostname – 主机名（IP 或 DNS 名称）
         // port – the port number. -1 indicates the scheme default port.
+        // port – 端口号。-1 表示方案默认端口。
         // scheme – the name of the scheme. null indicates the default scheme
+        // scheme – 方案的名称。null 表示默认方案
         final HttpHost httpHost = new HttpHost(HOSTNAME, PORT, SCHEME);
 
         // Returns a new RestClientBuilder to help with RestClient creation. Creates a new builder instance and sets the nodes that the client will send requests to.
+        // 返回一个新的 RestClientBuilder 以帮助创建 RestClient。创建新的生成器实例并设置客户端将向其发送请求的节点。
         // You can use this if you do not have metadata up front about the nodes. If you do, prefer builder(Node...).
+        // 如果预先没有有关节点的元数据，则可以使用它。如果这样做，请选择 builder（Node...）。
         final RestClientBuilder builder = RestClient.builder(httpHost);
 
         // Creates a RestHighLevelClient given the high level RestClientBuilder that allows to build the RestClient to be used to perform requests.
+        // 在给定高级 RestClientBuilder 的情况下创建一个 RestHighLevelClient，该 RestClientBuilder 允许生成用于执行请求的 RestClient。
         return new RestHighLevelClient(builder);
     }
 }
 ```
 
 ### 3、单元测试
+
+#### 3.1、简单测试
 
 ```java
 @SpringBootTest
@@ -4800,8 +4808,104 @@ public class GulimallSearchTests
     @Test
     public void contextLoads() {
         System.out.println(restHighLevelClient);
-        // org.elasticsearch.client.RestHighLevelClient@3fc7c734
     }
 }
 ```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code>org.elasticsearch.client.RestHighLevelClient@3fc7c734
+</code></pre></details>
+
+#### 3.2、Index API
+
+```java
+@SpringBootTest
+public class GulimallSearch1IndexAPITests
+{
+    @Autowired
+    private RestHighLevelClient client;
+
+    /**
+     * 测试 Index API
+     *
+     * @see {@linktourl
+     * <a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.4/java-rest-high-document-index.html">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.4/java-rest-high-document-index.html</a>}
+     */
+    @Test
+    public void testIndex() throws IOException {
+        // 构造 User
+        User user = new User()
+                .setName("Nathan Littel")
+                .setAge(18)
+                .setGender("男");
+        final String userJsonStr = JSON.toJSONString(user);
+
+        // Constructs a new index request against the specific index. The type(String) source(byte[], XContentType) must be set.
+        // 针对特定索引构造新的索引请求。必须设置 type（String） source（byte[]， XContentType）。
+        IndexRequest indexRequest = new IndexRequest("users");
+
+        // Sets the id of the indexed document. If not set, will be automatically generated.
+        // 设置索引文档的 ID。如果未设置，将自动生成。
+        indexRequest.id("1");
+
+        // Sets the document source to index. Note, its preferable to either set it using source(XContentBuilder) or using the source(byte[], XContentType).
+        // 将文档源设置到索引中。请注意，最好使用 source（XContentBuilder） 或使用 source（byte[]， XContentType） 来设置它。
+        indexRequest.source(userJsonStr, XContentType.JSON);
+
+        // Index a document using the Index API. See Index API on elastic.co
+        // 使用 Index API 索引一个文档。请参阅 elastic.co 上的 Index API
+        // Params:
+        //      indexRequest – the request
+        //      options – the request options (e.g. headers), use RequestOptions.DEFAULT if nothing needs to be customized
+        //      选项-请求选项（例如 headers），如果不需要自定义任何内容则使用 RequestOptions.DEFAULT
+        // Returns: the response
+        final IndexResponse response = client.index(indexRequest, GulimallElasticSearchConfig.COMMON_OPTIONS);
+
+        System.out.println(response);
+    }
+}
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code>IndexResponse[index=users,type=_doc,id=1,version=1,result=created,seqNo=0,primaryTerm=1,shards={"total":2,"successful":1,"failed":0}]
+</code></pre></details>
+
+> Kibana Dev Tools Console
+
+```bash
+GET users/_search
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-json">{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 1,
+      "relation" : "eq"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "users",
+        "_type" : "_doc",
+        "_id" : "1",
+        "_score" : 1.0,
+        "_source" : {
+          "age" : 18,
+          "gender" : "男",
+          "name" : "Nathan Littel"
+        }
+      }
+    ]
+  }
+}
+</code></pre></details>
 
