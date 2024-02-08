@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search;
+package xyz.funnyboyx.gulimall.search.api;
 
 import com.alibaba.fastjson.JSON;
 import org.elasticsearch.action.index.IndexRequest;

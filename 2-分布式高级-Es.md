@@ -4819,51 +4819,35 @@ public class GulimallSearchTests
 #### 3.2、Index API
 
 ```java
-@SpringBootTest
-public class GulimallSearch1IndexAPITests
-{
-    @Autowired
-    private RestHighLevelClient client;
+// 构造 User
+User user = new User()
+    .setName("Nathan Littel")
+    .setAge(18)
+    .setGender("男");
+final String userJsonStr = JSON.toJSONString(user);
 
-    /**
-     * 测试 Index API
-     *
-     * @see {@linktourl
-     * <a href="https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.4/java-rest-high-document-index.html">https://www.elastic.co/guide/en/elasticsearch/client/java-rest/7.4/java-rest-high-document-index.html</a>}
-     */
-    @Test
-    public void testIndex() throws IOException {
-        // 构造 User
-        User user = new User()
-                .setName("Nathan Littel")
-                .setAge(18)
-                .setGender("男");
-        final String userJsonStr = JSON.toJSONString(user);
+// Constructs a new index request against the specific index. The type(String) source(byte[], XContentType) must be set.
+// 针对特定索引构造新的索引请求。必须设置 type（String） source（byte[]， XContentType）。
+IndexRequest indexRequest = new IndexRequest("users");
 
-        // Constructs a new index request against the specific index. The type(String) source(byte[], XContentType) must be set.
-        // 针对特定索引构造新的索引请求。必须设置 type（String） source（byte[]， XContentType）。
-        IndexRequest indexRequest = new IndexRequest("users");
+// Sets the id of the indexed document. If not set, will be automatically generated.
+// 设置索引文档的 ID。如果未设置，将自动生成。
+indexRequest.id("1");
 
-        // Sets the id of the indexed document. If not set, will be automatically generated.
-        // 设置索引文档的 ID。如果未设置，将自动生成。
-        indexRequest.id("1");
+// Sets the document source to index. Note, its preferable to either set it using source(XContentBuilder) or using the source(byte[], XContentType).
+// 将文档源设置到索引中。请注意，最好使用 source（XContentBuilder） 或使用 source（byte[]， XContentType） 来设置它。
+indexRequest.source(userJsonStr, XContentType.JSON);
 
-        // Sets the document source to index. Note, its preferable to either set it using source(XContentBuilder) or using the source(byte[], XContentType).
-        // 将文档源设置到索引中。请注意，最好使用 source（XContentBuilder） 或使用 source（byte[]， XContentType） 来设置它。
-        indexRequest.source(userJsonStr, XContentType.JSON);
+// Index a document using the Index API. See Index API on elastic.co
+// 使用 Index API 索引一个文档。请参阅 elastic.co 上的 Index API
+// Params:
+//      indexRequest – the request
+//      options – the request options (e.g. headers), use RequestOptions.DEFAULT if nothing needs to be customized
+//      选项-请求选项（例如 headers），如果不需要自定义任何内容则使用 RequestOptions.DEFAULT
+// Returns: the response
+final IndexResponse response = client.index(indexRequest, GulimallElasticSearchConfig.COMMON_OPTIONS);
 
-        // Index a document using the Index API. See Index API on elastic.co
-        // 使用 Index API 索引一个文档。请参阅 elastic.co 上的 Index API
-        // Params:
-        //      indexRequest – the request
-        //      options – the request options (e.g. headers), use RequestOptions.DEFAULT if nothing needs to be customized
-        //      选项-请求选项（例如 headers），如果不需要自定义任何内容则使用 RequestOptions.DEFAULT
-        // Returns: the response
-        final IndexResponse response = client.index(indexRequest, GulimallElasticSearchConfig.COMMON_OPTIONS);
-
-        System.out.println(response);
-    }
-}
+System.out.println(response);
 ```
 
 <details><summary><font size="3" color="orange">返回结果</font></summary> 
@@ -4908,4 +4892,352 @@ GET users/_search
   }
 }
 </code></pre></details>
+#### 3.3、Search API
 
+> 搜索address中包含mill的所有人的年龄分布以及平均年龄，平均薪资
+
+```java
+// 1、创建检索请求
+SearchRequest searchRequest = new SearchRequest("bank");
+
+// 1.1、查询条件
+final SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+sourceBuilder.query(QueryBuilders.matchQuery("address", "mill"));
+searchRequest.source(sourceBuilder);
+
+// 1.2、聚合条件：
+// Aggregations can be added to the search by first creating the appropriate AggregationBuilder and then setting it on the SearchSourceBuilder.
+// 可以先建立适当的AggregationBuilder，然后在SearchSourceBuilder上进行设定，将聚合加入搜索。
+final TermsAggregationBuilder agg1 = AggregationBuilders
+    .terms("agg1")
+    .field("age")
+    .size(10);
+sourceBuilder.aggregation(agg1);
+final AvgAggregationBuilder agg2 = AggregationBuilders
+    .avg("agg2")
+    .field("balance");
+sourceBuilder.aggregation(agg2);
+
+// 2、执行检索请求
+final SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+System.out.println(response);
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-json">{
+    "took": 4,
+    "timed_out": false,
+    "_shards": {
+        "total": 1,
+        "successful": 1,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 4,
+            "relation": "eq"
+        },
+        "max_score": 5.4032025,
+        "hits": [
+            {
+                "_index": "bank",
+                "_type": "account",
+                "_id": "970",
+                "_score": 5.4032025,
+                "_source": {
+                    "account_number": 970,
+                    "balance": 19648,
+                    "firstname": "Forbes",
+                    "lastname": "Wallace",
+                    "age": 28,
+                    "gender": "M",
+                    "address": "990 Mill Road",
+                    "employer": "Pheast",
+                    "email": "forbeswallace@pheast.com",
+                    "city": "Lopezo",
+                    "state": "AK"
+                }
+            },
+            {
+                "_index": "bank",
+                "_type": "account",
+                "_id": "136",
+                "_score": 5.4032025,
+                "_source": {
+                    "account_number": 136,
+                    "balance": 45801,
+                    "firstname": "Winnie",
+                    "lastname": "Holland",
+                    "age": 38,
+                    "gender": "M",
+                    "address": "198 Mill Lane",
+                    "employer": "Neteria",
+                    "email": "winnieholland@neteria.com",
+                    "city": "Urie",
+                    "state": "IL"
+                }
+            },
+            {
+                "_index": "bank",
+                "_type": "account",
+                "_id": "345",
+                "_score": 5.4032025,
+                "_source": {
+                    "account_number": 345,
+                    "balance": 9812,
+                    "firstname": "Parker",
+                    "lastname": "Hines",
+                    "age": 38,
+                    "gender": "M",
+                    "address": "715 Mill Avenue",
+                    "employer": "Baluba",
+                    "email": "parkerhines@baluba.com",
+                    "city": "Blackgum",
+                    "state": "KY"
+                }
+            },
+            {
+                "_index": "bank",
+                "_type": "account",
+                "_id": "472",
+                "_score": 5.4032025,
+                "_source": {
+                    "account_number": 472,
+                    "balance": 25571,
+                    "firstname": "Lee",
+                    "lastname": "Long",
+                    "age": 32,
+                    "gender": "F",
+                    "address": "288 Mill Street",
+                    "employer": "Comverges",
+                    "email": "leelong@comverges.com",
+                    "city": "Movico",
+                    "state": "MT"
+                }
+            }
+        ]
+    },
+    "aggregations": {
+        "avg#agg2": {
+            "value": 25208.0
+        },
+        "lterms#agg1": {
+            "doc_count_error_upper_bound": 0,
+            "sum_other_doc_count": 0,
+            "buckets": [
+                {
+                    "key": 38,
+                    "doc_count": 2
+                },
+                {
+                    "key": 28,
+                    "doc_count": 1
+                },
+                {
+                    "key": 32,
+                    "doc_count": 1
+                }
+            ]
+        }
+    }
+}
+</code></pre></details>
+
+```java
+// 3、解析检索响应
+// 3.1、获取 java bean
+// Nested inside the SearchHits are the individual search results that can be iterated over:
+// 嵌套在SearchHits中的是可以迭代的单个搜索结果:
+for (SearchHit searchHit : response.getHits()) {
+    final String source = searchHit.getSourceAsString();
+    final Account account = JSON.parseObject(source, Account.class);
+    System.out.println(account);
+}
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-java">Account(accountNumber=970, balance=19648, firstname=Forbes, lastname=Wallace, age=28, gender=M, address=990 Mill Road, employer=Pheast, email=forbeswallace@pheast
+.com, city=Lopezo, state=AK)
+Account(accountNumber=136, balance=45801, firstname=Winnie, lastname=Holland, age=38, gender=M, address=198 Mill Lane, employer=Neteria, email=winnieholland@neteria
+.com, city=Urie, state=IL)
+Account(accountNumber=345, balance=9812, firstname=Parker, lastname=Hines, age=38, gender=M, address=715 Mill Avenue, employer=Baluba, email=parkerhines@baluba.com,
+city=Blackgum, state=KY)
+Account(accountNumber=472, balance=25571, firstname=Lee, lastname=Long, age=32, gender=F, address=288 Mill Street, employer=Comverges, email=leelong@comverges.com,
+city=Movico, state=MT)
+</code></pre></details>
+
+
+```java
+// 3.2、获取检索到的分析信息
+// Retrieving Aggregations
+// Aggregations can be retrieved from the SearchResponse by first getting the root of the aggregation tree, the Aggregations object, and then getting the aggregation by
+// name.
+// 可以从 SearchResponse 中检索聚合，方法是首先获取聚合树的根目录（即 Aggregations 对象），然后按名称获取聚合。
+final Aggregations aggregations = response.getAggregations();
+final Terms agg21 = aggregations.get("agg1");
+agg21
+    .getBuckets()
+    .forEach(bucket -> System.out.println(bucket.getKeyAsString()));
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-json">38
+28
+32
+</code></pre></details>
+
+> Kibana Dev Tools Console
+
+```bash
+GET bank/_search
+{
+  "query": {
+    "match": {
+      "address": "Mill"
+    }
+  },
+  "aggs": {
+    "ageAgg": {
+      "terms": {
+        "field": "age",
+        "size": 10
+      }
+    },
+    "ageAvg": {
+      "avg": {
+        "field": "age"
+      }
+    },
+    "balanceAvg": {
+      "avg": {
+        "field": "balance"
+      }
+    }
+  }
+}
+```
+
+<details><summary><font size="3" color="orange">返回结果</font></summary> 
+<pre><code class="language-json">{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 4,
+      "relation" : "eq"
+    },
+    "max_score" : 5.4032025,
+    "hits" : [
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "970",
+        "_score" : 5.4032025,
+        "_source" : {
+          "account_number" : 970,
+          "balance" : 19648,
+          "firstname" : "Forbes",
+          "lastname" : "Wallace",
+          "age" : 28,
+          "gender" : "M",
+          "address" : "990 Mill Road",
+          "employer" : "Pheast",
+          "email" : "forbeswallace@pheast.com",
+          "city" : "Lopezo",
+          "state" : "AK"
+        }
+      },
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "136",
+        "_score" : 5.4032025,
+        "_source" : {
+          "account_number" : 136,
+          "balance" : 45801,
+          "firstname" : "Winnie",
+          "lastname" : "Holland",
+          "age" : 38,
+          "gender" : "M",
+          "address" : "198 Mill Lane",
+          "employer" : "Neteria",
+          "email" : "winnieholland@neteria.com",
+          "city" : "Urie",
+          "state" : "IL"
+        }
+      },
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "345",
+        "_score" : 5.4032025,
+        "_source" : {
+          "account_number" : 345,
+          "balance" : 9812,
+          "firstname" : "Parker",
+          "lastname" : "Hines",
+          "age" : 38,
+          "gender" : "M",
+          "address" : "715 Mill Avenue",
+          "employer" : "Baluba",
+          "email" : "parkerhines@baluba.com",
+          "city" : "Blackgum",
+          "state" : "KY"
+        }
+      },
+      {
+        "_index" : "bank",
+        "_type" : "account",
+        "_id" : "472",
+        "_score" : 5.4032025,
+        "_source" : {
+          "account_number" : 472,
+          "balance" : 25571,
+          "firstname" : "Lee",
+          "lastname" : "Long",
+          "age" : 32,
+          "gender" : "F",
+          "address" : "288 Mill Street",
+          "employer" : "Comverges",
+          "email" : "leelong@comverges.com",
+          "city" : "Movico",
+          "state" : "MT"
+        }
+      }
+    ]
+  },
+  "aggregations" : {
+    "ageAgg" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : 38,
+          "doc_count" : 2
+        },
+        {
+          "key" : 28,
+          "doc_count" : 1
+        },
+        {
+          "key" : 32,
+          "doc_count" : 1
+        }
+      ]
+    },
+    "ageAvg" : {
+      "value" : 34.0
+    },
+    "balanceAvg" : {
+      "value" : 25208.0
+    }
+  }
+}
+</code></pre></details>
