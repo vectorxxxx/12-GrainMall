@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.common.utils.R;
@@ -14,7 +15,9 @@ import xyz.funnyboy.gulimall.ware.entity.WareSkuEntity;
 import xyz.funnyboy.gulimall.ware.feign.ProductFeignService;
 import xyz.funnyboy.gulimall.ware.service.WareSkuService;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service("wareSkuService")
 public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> implements WareSkuService
@@ -64,6 +67,20 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         wareSkuEntity.setStockLocked(0);
         this.saveOrUpdate(wareSkuEntity);
         return price;
+    }
+
+    @Override
+    public List<SkuHasStockVO> getSkuHasStock(List<Long> skuIds) {
+        return skuIds
+                .stream()
+                .map(skuId -> {
+                    final SkuHasStockVO skuHasStockVO = new SkuHasStockVO();
+                    skuHasStockVO.setSkuId(skuId);
+                    Long count = baseMapper.getSkuStock(skuId);
+                    skuHasStockVO.setHasStock(count != null && count > 0);
+                    return skuHasStockVO;
+                })
+                .collect(Collectors.toList());
     }
 
 }

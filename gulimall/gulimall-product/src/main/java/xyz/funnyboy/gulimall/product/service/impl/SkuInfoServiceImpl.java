@@ -13,6 +13,7 @@ import xyz.funnyboy.gulimall.product.entity.SkuInfoEntity;
 import xyz.funnyboy.gulimall.product.service.SkuInfoService;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Map;
 
 @Service("skuInfoService")
@@ -53,4 +54,8 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
         return new PageUtils(page);
     }
 
+    @Override
+    public List<SkuInfoEntity> getSkuBySpuId(Long spuId) {
+        return baseMapper.selectList(new LambdaQueryWrapper<SkuInfoEntity>().eq(SkuInfoEntity::getSpuId, spuId));
+    }
 }

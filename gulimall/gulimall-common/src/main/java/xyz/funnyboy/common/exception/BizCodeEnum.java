@@ -27,9 +27,9 @@ public enum BizCodeEnum
     NOT_STOCK_EXCEPTION(21000, "商品库存不足"),
     PRODUCT_UP_EXCEPTION(11000, "商品上架异常");
 
-    private int code;
+    private final int code;
 
-    private String msg;
+    private final String msg;
 
     BizCodeEnum(int code, String msg) {
         this.code = code;

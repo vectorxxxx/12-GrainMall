@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="xyz.funnyboy.gulimall.product.dao.AttrDao">
-
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="xyz.funnyboy.gulimall.product.entity.AttrEntity" id="attrMap">
         <result property="attrId" column="attr_id"/>
         <result property="attrName" column="attr_name"/>
@@ -16,5 +15,13 @@
         <result property="showDesc" column="show_desc"/>
     </resultMap>
 
-
+    <select id="selectSearchAttrIds" resultType="java.lang.Long">
+        select attr_id
+        from gulimall_pms.pms_attr
+        where attr_id in
+        <foreach collection="attrIds" item="id" separator="," open="(" close=")">
+            #{id}
+        </foreach>
+        and search_type = 1
+    </select>
 </mapper>

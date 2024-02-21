@@ -12,9 +12,9 @@ public class ProductConstant
         ATTR_TYPE_BASE(1, "基本属性"),
         ATTR_TYPE_SALE(0, "销售属性");
 
-        private int code;
+        private final int code;
 
-        private String msg;
+        private final String msg;
 
         AttrEnum(int code, String msg) {
             this.code = code;
@@ -36,9 +36,9 @@ public class ProductConstant
         SPU_UP(1, "上架"),
         SPU_DOWN(2, "下架");
 
-        private int code;
+        private final int code;
 
-        private String msg;
+        private final String msg;
 
         StatusEnum(int code, String msg) {
             this.code = code;
