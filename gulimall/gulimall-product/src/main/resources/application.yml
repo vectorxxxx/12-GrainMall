@@ -15,6 +15,8 @@ spring:
   # 时间格式化
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
+  thymeleaf:
+    cache: false # 开发环境关闭缓存，以便在修改页面时实时生效
 
 # Mybatis-Plus 配置
 mybatis-plus:
@@ -26,7 +28,7 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 server:
-  port: 10001
+  port: 10000
 
 # 日志级别调整，方便查看sql
 logging:
