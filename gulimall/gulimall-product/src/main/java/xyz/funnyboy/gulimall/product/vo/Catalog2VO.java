@@ -15,22 +15,22 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Catelog2VO implements Serializable
+public class Catalog2VO implements Serializable
 {
     private static final long serialVersionUID = -6641472202687699564L;
+    private String catalog1Id;
+    private List<Catalog3VO> catalog3List;
     private String id;
     private String name;
-    private String catelog1Id;
-    private List<Catelog3VO> catelog3List;
 
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class Catelog3VO implements Serializable
+    public static class Catalog3VO implements Serializable
     {
         private static final long serialVersionUID = 8329497023658925759L;
+        private String catalog2Id;
         private String id;
         private String name;
-        private String catelog2Id;
     }
 }

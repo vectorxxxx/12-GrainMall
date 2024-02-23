@@ -13,7 +13,7 @@ import xyz.funnyboy.gulimall.product.dao.CategoryBrandRelationDao;
 import xyz.funnyboy.gulimall.product.dao.CategoryDao;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
-import xyz.funnyboy.gulimall.product.vo.Catelog2VO;
+import xyz.funnyboy.gulimall.product.vo.Catalog2VO;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -157,12 +157,12 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
     /**
      * 获取 catelog json
      *
-     * @return {@link Map}<{@link String}, {@link List}<{@link Catelog2VO}>>
+     * @return {@link Map}<{@link String}, {@link List}<{@link Catalog2VO}>>
      */
     @Cacheable(value = "category",
                key = "#root.methodName")
     @Override
-    public Map<String, List<Catelog2VO>> getCatelogJson() {
+    public Map<String, List<Catalog2VO>> getCatelogJson() {
         // 查询所有分类，并按照父 ID 分组
         final Map<Long, List<CategoryEntity>> categoryMap = baseMapper
                 .selectList(null)
@@ -172,24 +172,27 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return categoryMap
                 .get(0L)
                 .stream()
-                .collect(Collectors.toMap(k -> k
+                .collect(Collectors.toMap(l1 -> l1
                         .getCatId()
                         .toString(), l1 -> categoryMap
                         .get(l1.getCatId())
                         .stream()
-                        .map(l2 -> new Catelog2VO(l2
-                                .getCatId()
-                                .toString(), l2.getName(), l1
-                                .getCatId()
-                                .toString(), categoryMap
-                                .get(l2.getCatId())
-                                .stream()
-                                .map(l3 -> new Catelog2VO.Catelog3VO(l3
-                                        .getCatId()
-                                        .toString(), l3.getName(), l2
-                                        .getCatId()
-                                        .toString()))
-                                .collect(Collectors.toList())))
+                        .map(l2 -> {
+                            final List<Catalog2VO.Catalog3VO> catalog3VOList = categoryMap
+                                    .get(l2.getCatId())
+                                    .stream()
+                                    .map(l3 -> new Catalog2VO.Catalog3VO(l2
+                                            .getCatId()
+                                            .toString(), l3
+                                            .getCatId()
+                                            .toString(), l3.getName()))
+                                    .collect(Collectors.toList());
+                            return new Catalog2VO(l1
+                                    .getCatId()
+                                    .toString(), catalog3VOList, l2
+                                    .getCatId()
+                                    .toString(), l2.getName());
+                        })
                         .collect(Collectors.toList())));
     }
 }

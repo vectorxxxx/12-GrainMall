@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
-import xyz.funnyboy.gulimall.product.vo.Catelog2VO;
+import xyz.funnyboy.gulimall.product.vo.Catalog2VO;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +32,7 @@ public class IndexController
 
     @ResponseBody
     @GetMapping("/index/catalog.json")
-    public Map<String, List<Catelog2VO>> getCatlogJson() {
+    public Map<String, List<Catalog2VO>> getCatlogJson() {
         return categoryService.getCatelogJson();
     }
 }

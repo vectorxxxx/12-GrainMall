@@ -3,7 +3,7 @@ package xyz.funnyboy.gulimall.product.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.CategoryEntity;
-import xyz.funnyboy.gulimall.product.vo.Catelog2VO;
+import xyz.funnyboy.gulimall.product.vo.Catalog2VO;
 
 import java.util.List;
 import java.util.Map;
@@ -67,8 +67,8 @@ public interface CategoryService extends IService<CategoryEntity>
     /**
      * 获取分类 json
      *
-     * @return {@link Map}<{@link String}, {@link List}<{@link Catelog2VO}>>
+     * @return {@link Map}<{@link String}, {@link List}<{@link Catalog2VO}>>
      */
-    Map<String, List<Catelog2VO>> getCatelogJson();
+    Map<String, List<Catalog2VO>> getCatelogJson();
 }
 
