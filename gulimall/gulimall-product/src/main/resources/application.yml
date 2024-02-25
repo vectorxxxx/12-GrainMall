@@ -16,7 +16,12 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
-    cache: false # 开发环境关闭缓存，以便在修改页面时实时生效
+    #    cache: false # 开发环境关闭缓存，以便在修改页面时实时生效
+    cache: true # 性能压测用
+  # redis
+  redis:
+    host: 192.168.56.10
+    port: 6379
 
 # Mybatis-Plus 配置
 mybatis-plus:
@@ -34,3 +39,4 @@ server:
 logging:
   level:
     xyz.funnyboy.gulimall.product: debug
+#    xyz.funnyboy.gulimall.product: error # 性能压测用

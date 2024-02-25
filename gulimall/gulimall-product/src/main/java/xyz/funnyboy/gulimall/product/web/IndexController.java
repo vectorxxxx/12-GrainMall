@@ -33,6 +33,19 @@ public class IndexController
     @ResponseBody
     @GetMapping("/index/catalog.json")
     public Map<String, List<Catalog2VO>> getCatlogJson() {
-        return categoryService.getCatelogJson();
+        // 优化前，性能压测用
+        // return categoryService.getCatalogJsonBeforeOptimization();
+        return categoryService.getCatalogJson();
+    }
+
+    /**
+     * 性能压测-简单服务
+     *
+     * @return {@link String}
+     */
+    @ResponseBody
+    @GetMapping("/hello")
+    public String hello() {
+        return "hello";
     }
 }
