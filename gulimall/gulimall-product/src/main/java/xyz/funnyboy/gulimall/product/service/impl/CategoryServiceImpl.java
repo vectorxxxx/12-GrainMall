@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
@@ -168,7 +169,7 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         // 1、缓存穿透（查询结果为空）：空结果缓存
         // 2、缓存雪崩（相同过期时间）：设置过期时间（加随机值）
         // 3、缓存击穿（热点key失效）：加锁
-        
+
         // 从缓存中查询
         final String catalogJson = stringRedisTemplate
                 .opsForValue()
@@ -180,61 +181,105 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         log.info("缓存未命中...即将查询数据库...");
         // 缓存中没有在从数据库中查询
-        return getCatalogJsonFromDb();
+        return getCatalogJsonFromDbWithRedisLock();
     }
 
     @Override
-    public Map<String, List<Catalog2VO>> getCatalogJsonFromDb() {
-        synchronized (this) {
-            final String catalogJson = stringRedisTemplate
-                    .opsForValue()
-                    .get("catalogJson");
-            if (!StringUtils.isEmpty(catalogJson)) {
-                log.info("缓存命中...直接返回...");
-                return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2VO>>>() {});
+    public Map<String, List<Catalog2VO>> getCatalogJsonFromDbWithRedisLock() {
+        // 1、分布式占锁
+        final String uuid = UUID
+                .randomUUID()
+                .toString();
+        // SETNXEX 原子加锁
+        final Boolean lock = stringRedisTemplate
+                .opsForValue()
+                .setIfAbsent("lock", uuid, 300, TimeUnit.SECONDS);
+        if (lock != null && lock) {
+            log.info("分布式占锁成功...");
+            // 2、设置过期时间加锁成功 获取数据释放锁 [分布式下必须是Lua脚本删锁,不然会因为业务处理时间、网络延迟等等引起数据还没返回锁过期或者返回的过程中过期 然后把别人的锁删了]
+            final Map<String, List<Catalog2VO>> result;
+            try {
+                result = getDataFromDb();
             }
-
-            log.info("缓存未命中...查询数据库...");
-            // 查询所有分类，并按照父 ID 分组
-            final Map<Long, List<CategoryEntity>> categoryMap = baseMapper
-                    .selectList(null)
-                    .stream()
-                    .collect(Collectors.groupingBy(CategoryEntity::getParentCid));
-            // 查询一级分类
-            final Map<String, List<Catalog2VO>> catalogJsonFromDb = categoryMap
-                    .get(0L)
-                    .stream()
-                    .collect(Collectors.toMap(l1 -> l1
-                            .getCatId()
-                            .toString(), l1 -> categoryMap
-                            .get(l1.getCatId())
-                            .stream()
-                            .map(l2 -> {
-                                final List<Catalog2VO.Catalog3VO> catalog3VOList = categoryMap
-                                        .get(l2.getCatId())
-                                        .stream()
-                                        .map(l3 -> new Catalog2VO.Catalog3VO(l2
-                                                .getCatId()
-                                                .toString(), l3
-                                                .getCatId()
-                                                .toString(), l3.getName()))
-                                        .collect(Collectors.toList());
-                                return new Catalog2VO(l1
-                                        .getCatId()
-                                        .toString(), catalog3VOList, l2
-                                        .getCatId()
-                                        .toString(), l2.getName());
-                            })
-                            .collect(Collectors.toList())));
-
-            // 存入缓存
-            stringRedisTemplate
-                    .opsForValue()
-                    .set("catalogJson", JSON.toJSONString(catalogJsonFromDb), 1, TimeUnit.DAYS);
-
-            // 返回结果
-            return catalogJsonFromDb;
+            finally {
+                // 删除也必须是原子操作 Lua脚本操作 删除成功返回1 否则返回0
+                // see: http://www.redis.cn/commands/set.html
+                final String script = "if redis.call('get',KEYS[1]) == ARGV[1] then return redis.call('del',KEYS[1]) else return 0 end";
+                // 原子删锁
+                stringRedisTemplate.execute(new DefaultRedisScript<>(script, Long.class), Collections.singletonList("lock"), uuid);
+            }
+            return result;
         }
+        else {
+            log.info("分布式占锁失败...");
+            // 重试占锁
+            try {
+                Thread.sleep(200);
+            }
+            catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            // 自旋的方式
+            return getCatalogJsonFromDbWithRedisLock();
+        }
+    }
+
+    @Override
+    public Map<String, List<Catalog2VO>> getCatalogJsonFromDbWithLocalLock() {
+        synchronized (this) {
+            return getDataFromDb();
+        }
+    }
+
+    private Map<String, List<Catalog2VO>> getDataFromDb() {
+        final String catalogJson = stringRedisTemplate
+                .opsForValue()
+                .get("catalogJson");
+        if (!StringUtils.isEmpty(catalogJson)) {
+            log.info("缓存命中...直接返回...");
+            return JSON.parseObject(catalogJson, new TypeReference<Map<String, List<Catalog2VO>>>() {});
+        }
+
+        log.info("缓存未命中...查询数据库...");
+        // 查询所有分类，并按照父 ID 分组
+        final Map<Long, List<CategoryEntity>> categoryMap = baseMapper
+                .selectList(null)
+                .stream()
+                .collect(Collectors.groupingBy(CategoryEntity::getParentCid));
+        // 查询一级分类
+        final Map<String, List<Catalog2VO>> catalogJsonFromDb = categoryMap
+                .get(0L)
+                .stream()
+                .collect(Collectors.toMap(l1 -> l1
+                        .getCatId()
+                        .toString(), l1 -> categoryMap
+                        .get(l1.getCatId())
+                        .stream()
+                        .map(l2 -> {
+                            final List<Catalog2VO.Catalog3VO> catalog3VOList = categoryMap
+                                    .get(l2.getCatId())
+                                    .stream()
+                                    .map(l3 -> new Catalog2VO.Catalog3VO(l2
+                                            .getCatId()
+                                            .toString(), l3
+                                            .getCatId()
+                                            .toString(), l3.getName()))
+                                    .collect(Collectors.toList());
+                            return new Catalog2VO(l1
+                                    .getCatId()
+                                    .toString(), catalog3VOList, l2
+                                    .getCatId()
+                                    .toString(), l2.getName());
+                        })
+                        .collect(Collectors.toList())));
+
+        // 存入缓存
+        stringRedisTemplate
+                .opsForValue()
+                .set("catalogJson", JSON.toJSONString(catalogJsonFromDb), 1, TimeUnit.DAYS);
+
+        // 返回结果
+        return catalogJsonFromDb;
     }
 
     /**

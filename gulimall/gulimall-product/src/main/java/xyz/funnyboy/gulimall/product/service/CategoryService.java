@@ -72,11 +72,18 @@ public interface CategoryService extends IService<CategoryEntity>
     Map<String, List<Catalog2VO>> getCatalogJson();
 
     /**
-     * 获取分类 json（无缓存）
+     * 获取分类 json（分布式锁）
      *
      * @return {@link Map}<{@link String}, {@link List}<{@link Catalog2VO}>>
      */
-    Map<String, List<Catalog2VO>> getCatalogJsonFromDb();
+    Map<String, List<Catalog2VO>> getCatalogJsonFromDbWithRedisLock();
+
+    /**
+     * 获取分类 json（本地锁）
+     *
+     * @return {@link Map}<{@link String}, {@link List}<{@link Catalog2VO}>>
+     */
+    Map<String, List<Catalog2VO>> getCatalogJsonFromDbWithLocalLock();
 
     /**
      * 获取分类 json（优化前，性能压测用）
