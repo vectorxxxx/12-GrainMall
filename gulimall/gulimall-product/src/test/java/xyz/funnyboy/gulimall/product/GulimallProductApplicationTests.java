@@ -1,6 +1,7 @@
 package xyz.funnyboy.gulimall.product;
 
 import org.junit.jupiter.api.Test;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import xyz.funnyboy.gulimall.product.entity.BrandEntity;
@@ -11,6 +12,14 @@ class GulimallProductApplicationTests
 {
     @Autowired
     private BrandService brandService;
+
+    @Autowired
+    private RedissonClient redissonClient;
+
+    @Test
+    void testRedissonClient() {
+        System.out.println(redissonClient); // org.redisson.Redisson@68c4db77
+    }
 
     @Test
     void testSave() {

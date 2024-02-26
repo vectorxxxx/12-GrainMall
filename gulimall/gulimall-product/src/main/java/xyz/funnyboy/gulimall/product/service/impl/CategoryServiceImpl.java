@@ -7,6 +7,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.redisson.api.RLock;
+import org.redisson.api.RReadWriteLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -33,6 +36,9 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -181,7 +187,29 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
 
         log.info("缓存未命中...即将查询数据库...");
         // 缓存中没有在从数据库中查询
-        return getCatalogJsonFromDbWithRedisLock();
+        // return getCatalogJsonFromDbWithLocalLock();
+        // return getCatalogJsonFromDbWithRedisLock();
+        return getCatalogJsonFromDbWithRedissonLock();
+    }
+
+    @Override
+    public Map<String, List<Catalog2VO>> getCatalogJsonFromDbWithRedissonLock() {
+        // 1、占分布式锁。去redis占坑
+        //（锁的粒度，越细越快）例如具体缓存的是某个数据，11号商品，锁名就设product-11-lock，不锁其他商品
+        // final RLock lock = redissonClient.getLock("catalogJson-lock");
+        // 创建读锁
+        final RReadWriteLock readWriteLock = redissonClient.getReadWriteLock("catalogJson-lock");
+        final RLock rLock = readWriteLock.readLock();
+        final Map<String, List<Catalog2VO>> result;
+        try {
+            rLock.lock();
+            log.info("读锁加锁成功...执行业务");
+            result = getDataFromDb();
+        }
+        finally {
+            rLock.unlock();
+        }
+        return result;
     }
 
     @Override
