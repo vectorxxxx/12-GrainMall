@@ -16,12 +16,24 @@ spring:
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
   thymeleaf:
-    #    cache: false # 开发环境关闭缓存，以便在修改页面时实时生效
-    cache: true # 性能压测用
+    cache: false # 开发环境关闭缓存，以便在修改页面时实时生效
+  #    cache: true # 性能压测用
   # redis
   redis:
     host: 192.168.56.10
     port: 6379
+  # SpringCache
+  cache:
+    type: redis
+    redis:
+      # 过期时间设置为3600s，即1小时
+      time-to-live: 3600000
+      # 设置key的前缀,一般情况下不要自定统一前缀,方便分区处理
+      #      key-prefix: _CACHE
+      # key是否使用前缀
+      use-key-prefix: true
+      # 是否允许空值. 防止缓存穿透，可缓存null值
+      cache-null-values: true
 
 # Mybatis-Plus 配置
 mybatis-plus:

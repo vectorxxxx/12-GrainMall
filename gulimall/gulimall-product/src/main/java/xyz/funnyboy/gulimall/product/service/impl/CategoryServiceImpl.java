@@ -11,9 +11,13 @@ import org.redisson.api.RLock;
 import org.redisson.api.RReadWriteLock;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
@@ -159,12 +163,26 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
      *
      * @param category 类别
      */
+    @Transactional
+    // @CacheEvict(value = {"category"},
+    //             key = "'getLevel1Categorys'")
+    // @CacheEvict(value = {"category"},
+    //             allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "category",
+                        key = "'getLevel1Categorys'"),
+            @CacheEvict(value = "category",
+                        key = "'getCatalogJson'")
+    })
     @Override
     public void updateCascade(CategoryEntity category) {
         this.updateById(category);
         categoryBrandRelationDao.updateCategory(category.getCatId(), category.getName());
     }
 
+    @Cacheable(value = "category",
+               key = "#root.method.name",
+               sync = true)
     @Override
     public List<CategoryEntity> getLevel1Categorys() {
         return baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, 0));

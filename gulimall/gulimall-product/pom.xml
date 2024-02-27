@@ -31,6 +31,12 @@
             <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
+        <!-- SpringCache -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
         <!-- Redis -->
         <!-- lettuce 客户端底层使用 netty 连接 redis（不过我这里使用jmeter压测没有出现异常，不知道是不是因为使用的版本比老师的版本高的原因-->
         <!--<dependency>-->
