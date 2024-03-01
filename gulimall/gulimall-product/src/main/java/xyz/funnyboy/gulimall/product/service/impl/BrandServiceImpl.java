@@ -13,6 +13,7 @@ import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.service.BrandService;
 import xyz.funnyboy.gulimall.product.service.CategoryBrandRelationService;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -62,6 +63,11 @@ public class BrandServiceImpl extends ServiceImpl<BrandDao, BrandEntity> impleme
             categoryBrandRelationService.updateBrand(brand.getBrandId(), brand.getName());
             // TODO 更新其他关联
         }
+    }
+
+    @Override
+    public List<BrandEntity> queryByIds(List<Long> brandIds) {
+        return baseMapper.selectList(new LambdaQueryWrapper<BrandEntity>().in(BrandEntity::getBrandId, brandIds));
     }
 
 }

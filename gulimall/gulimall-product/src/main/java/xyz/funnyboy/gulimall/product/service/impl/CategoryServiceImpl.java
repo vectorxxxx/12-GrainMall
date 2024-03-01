@@ -188,8 +188,10 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         return baseMapper.selectList(new LambdaQueryWrapper<CategoryEntity>().eq(CategoryEntity::getParentCid, 0));
     }
 
+    @Cacheable(value = "category",
+               key = "#root.methodName")
     @Override
-    public Map<String, List<Catalog2VO>> getCatalogJson() {
+    public Map<String, List<Catalog2VO>> getCatalogJson2() {
         // 1、缓存穿透（查询结果为空）：空结果缓存
         // 2、缓存雪崩（相同过期时间）：设置过期时间（加随机值）
         // 3、缓存击穿（热点key失效）：加锁
@@ -207,6 +209,16 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryDao, CategoryEntity
         // 缓存中没有在从数据库中查询
         // return getCatalogJsonFromDbWithLocalLock();
         // return getCatalogJsonFromDbWithRedisLock();
+        return getCatalogJsonFromDbWithRedissonLock();
+    }
+
+    @Cacheable(value = "category",
+               key = "#root.method.name")
+    @Override
+    public Map<String, List<Catalog2VO>> getCatalogJson() {
+
+        log.info("缓存未命中...即将查询数据库...");
+        // 缓存中没有在从数据库中查询
         return getCatalogJsonFromDbWithRedissonLock();
     }
 

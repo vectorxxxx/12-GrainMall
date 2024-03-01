@@ -29,6 +29,12 @@ public class R extends HashMap<String, Object>
         return JSON.parseObject(JSON.toJSONString(data), typeReference);
     }
 
+    //利用fastjson进行反序列化
+    public <T> T getData(String key, TypeReference<T> typeReference) {
+        final Object data = get(key);
+        return JSON.parseObject(JSON.toJSONString(data), typeReference);
+    }
+
     public R setData(Object data) {
         put("data", data);
         return this;

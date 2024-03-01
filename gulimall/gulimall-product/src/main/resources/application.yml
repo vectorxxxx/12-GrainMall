@@ -29,7 +29,7 @@ spring:
       # 过期时间设置为3600s，即1小时
       time-to-live: 3600000
       # 设置key的前缀,一般情况下不要自定统一前缀,方便分区处理
-      #      key-prefix: _CACHE
+#      key-prefix: CACHE_
       # key是否使用前缀
       use-key-prefix: true
       # 是否允许空值. 防止缓存穿透，可缓存null值

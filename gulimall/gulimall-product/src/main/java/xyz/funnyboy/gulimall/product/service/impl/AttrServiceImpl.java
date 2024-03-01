@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -140,6 +141,8 @@ public class AttrServiceImpl extends ServiceImpl<AttrDao, AttrEntity> implements
      * @param attrId 属性 ID
      * @return {@link AttrRespVo}
      */
+    @Cacheable(value = "attr",
+               key = "'attrInfo:' + #root.args[0]")
     @Override
     public AttrRespVo getAttrInfo(Long attrId) {
         // 查询属性

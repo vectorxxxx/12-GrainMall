@@ -44,9 +44,10 @@ public class IndexController
 
     @ResponseBody
     @GetMapping("/index/catalog.json")
-    public Map<String, List<Catalog2VO>> getCatlogJson() {
+    public Map<String, List<Catalog2VO>> getCatalogJson() {
         // 优化前，性能压测用
         // return categoryService.getCatalogJsonBeforeOptimization();
+        // return categoryService.getCatalogJson2();
         return categoryService.getCatalogJson();
     }
 

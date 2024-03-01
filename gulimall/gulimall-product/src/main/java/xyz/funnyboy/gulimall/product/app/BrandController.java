@@ -12,6 +12,7 @@ import xyz.funnyboy.gulimall.product.entity.BrandEntity;
 import xyz.funnyboy.gulimall.product.service.BrandService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -56,6 +57,16 @@ public class BrandController
         return R
                 .ok()
                 .put("brand", brand);
+    }
+
+    @RequestMapping("/info/ids")
+    public R infoByIds(
+            @RequestParam("brandIds")
+                    List<Long> brandIds) {
+        List<BrandEntity> brandEntityList = brandService.queryByIds(brandIds);
+        return R
+                .ok()
+                .put("brand", brandEntityList);
     }
 
     /**
