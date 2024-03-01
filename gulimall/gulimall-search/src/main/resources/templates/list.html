@@ -17,7 +17,7 @@
     <div class="header_head_box">
         <b class="header_head_p">
             <div style="overflow: hidden">
-                <a href="http://gulimalll.com" class="header_head_p_a1" style="width:73px;">
+                <a href="http://gulimall.com" class="header_head_p_a1" style="width:73px;">
                     谷粒商城首页
                 </a>
                 <a href="/static/search/#" class="header_head_p_a">
@@ -399,7 +399,7 @@
 <!--搜索导航-->
 <div class="header_sous">
     <div class="logo">
-        <a href="http://gulimalll.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
+        <a href="http://gulimall.com"><img src="/static/search/image/logo1.jpg" alt=""></a>
     </div>
     <div class="header_form">
         <input id="keyword_input" type="text" placeholder="手机" th:value="${param.keyword}"/>
@@ -751,7 +751,7 @@
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
         <div class="JD_ipone_one c">
             <a th:each="nav: ${result.navs}" th:href="${nav.link}">
-                <span th:text="${nav.navName}"></span>：<span th:text="${nav.navValue}"></span> x
+                <span th:text="${nav.navName}"></span>：<span th:text="${nav.navValue}"></span> ×
             </a>
         </div>
         <i><img src="/static/search/image/right-@1x.png" alt=""></i>
@@ -801,9 +801,9 @@
                     </div>
                 </div>
                 <!--分类-->
-                <div class="JD_nav_wrap">
+                <div class="JD_pre">
                     <div class="sl_key">
-                        <span>分类：</span>
+                        <span><b>分类：</b></span>
                     </div>
                     <div class="sl_value">
                         <div class="sl_value_logo">
@@ -1027,19 +1027,22 @@
                                th:attr="style=${(#strings.isEmpty(p) || #strings.startsWith(p, 'hotScore')
                                ? 'color: #fff; border-color: #e4393c; background: #e4393c;' : 'color: #333; border-color: #ccc; background: #fff;'
                                )}"
-                               href="/static/search/#">综合排序[[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'hotScore') && #strings.endsWith(p, 'desc')) ? '↑' : '↓'}]]</a>
+                               href="/static/search/#">综合排序[[${(#strings.isEmpty(p) || !#strings.startsWith(p, 'hotScore')) ? '' :
+                                (#strings.startsWith(p, 'hotScore') && #strings.endsWith(p, 'desc') ? '↑' : '↓')}]]</a>
                             <a sort="saleCount"
                                th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount') && #strings.endsWith(p, 'desc')) ? 'sort_a desc' : 'sort_a'}"
                                th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount')
                                ? 'color: #fff; border-color: #e4393c; background: #e4393c;' : 'color: #333; border-color: #ccc; background: #fff;'
                                )}"
-                               href="/static/search/#">销量[[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'saleCount') && #strings.endsWith(p, 'desc')) ? '↑' : '↓'}]]</a>
+                               href="/static/search/#">销量[[${(#strings.isEmpty(p) || !#strings.startsWith(p, 'saleCount')) ? '' :
+                                (#strings.startsWith(p, 'saleCount') && #strings.endsWith(p, 'desc') ? '↑' : '↓')}]]</a>
                             <a sort="skuPrice"
                                th:class="${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice') && #strings.endsWith(p, 'desc')) ? 'sort_a desc' : 'sort_a'}"
                                th:attr="style=${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice')
                                ? 'color: #fff; border-color: #e4393c; background: #e4393c;' : 'color: #333; border-color: #ccc; background: #fff;'
                                )}"
-                               href="/static/search/#">价格[[${(!#strings.isEmpty(p) && #strings.startsWith(p, 'skuPrice') && #strings.endsWith(p, 'desc')) ? '↑' : '↓'}]]</a>
+                               href="/static/search/#">价格[[${(#strings.isEmpty(p) || !#strings.startsWith(p, 'skuPrice')) ? '' :
+                                (#strings.startsWith(p, 'skuPrice') && #strings.endsWith(p, 'desc') ? '↑' : '↓')}]]</a>
                             <a href="/static/search/#">评论分</a>
                             <a href="/static/search/#">上架时间</a>
                             <input id="skuPriceFrom" type="number"
@@ -1226,8 +1229,7 @@
                                 </a>
                                 <a class="page_a"
                                    th:each="navs: ${result.pageNavs}"
-                                   th:attr="pn=${navs},style=${navs == result.pageNum ? 'border: 0;color:#ee2222;background: #fff' : ''}"
-                                   style="border: 0;color:#ee2222;background: #fff">[[${navs}]]</a>
+                                   th:attr="pn=${navs},style=${navs == result.pageNum ? 'border: 0;color:#ee2222;background: #fff' : ''}">[[${navs}]]</a>
                                 <a class="page_a"
                                    th:attr="pn=${result.pageNum + 1}"
                                    th:if="${result.pageNum < result.totalPages}">
@@ -1987,7 +1989,7 @@
     }
 
     function searchByKeyword() {
-        searchProducts("keyword", $('#keyword_input').val())
+        location.href = replaceOrAddParamVal(location.href, "keyword", $('#keyword_input').val(), false)
     }
 
     $('.page_a').click(function () {
@@ -2004,9 +2006,9 @@
     function replaceOrAddParamVal(url, paramName, replaceVal, forceAdd) {
         let oUrl = url.toString();
         let nUrl;
-        if (oUrl.indexOf(paramName) !== -1) {
+        if (oUrl.indexOf(paramName) != -1) {
             if (forceAdd) {
-                if (oUrl.indexOf("?") !== -1) {
+                if (oUrl.indexOf("?") != -1) {
                     nUrl = oUrl + "&" + paramName + "=" + replaceVal;
                 } else {
                     nUrl = oUrl + "?" + paramName + "=" + replaceVal;
@@ -2016,7 +2018,7 @@
                 nUrl = oUrl.replace(re, paramName + '=' + replaceVal);
             }
         } else {
-            if (oUrl.indexOf("?") !== -1) {
+            if (oUrl.indexOf("?") != -1) {
                 nUrl = oUrl + "&" + paramName + "=" + replaceVal;
             } else {
                 nUrl = oUrl + "?" + paramName + "=" + replaceVal;

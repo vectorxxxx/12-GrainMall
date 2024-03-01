@@ -1,7 +1,6 @@
 package xyz.funnyboyx.gulimall.search.service.impl;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.TypeReference;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.search.join.ScoreMode;
 import org.elasticsearch.action.search.SearchRequest;
@@ -28,14 +27,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.to.es.SkuEsModel;
-import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.common.vo.search.SearchParam;
 import xyz.funnyboy.common.vo.search.SearchResult;
 import xyz.funnyboyx.gulimall.search.config.GulimallElasticSearchConfig;
 import xyz.funnyboyx.gulimall.search.constant.EsConstant;
 import xyz.funnyboyx.gulimall.search.feign.ProductFeignService;
 import xyz.funnyboyx.gulimall.search.service.MallSearchService;
-import xyz.funnyboyx.gulimall.search.vo.AttrResponseVo;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -323,6 +320,9 @@ public class MallSearchServiceImpl implements MallSearchService
                     return attrVo;
                 })
                 .collect(Collectors.toList());
+        final Map<Long, String> attrMap = attrVoList
+                .stream()
+                .collect(Collectors.toMap(SearchResult.AttrVo::getAttrId, SearchResult.AttrVo::getAttrName));
         result.setAttrs(attrVoList);
 
         // 3、当前商品涉及到的所有品牌信息
@@ -364,6 +364,9 @@ public class MallSearchServiceImpl implements MallSearchService
                     return brandVo;
                 })
                 .collect(Collectors.toList());
+        final Map<Long, String> brandMap = brandVoList
+                .stream()
+                .collect(Collectors.toMap(SearchResult.BrandVo::getBrandId, SearchResult.BrandVo::getBrandName));
         result.setBrands(brandVoList);
 
         // 4、当前商品涉及到的所有分类信息
@@ -429,19 +432,15 @@ public class MallSearchServiceImpl implements MallSearchService
                         // 封装属性值
                         navVo.setNavValue(s[1]);
                         // 封装属性名
-                        final R r = productFeignService.info(Long.parseLong(s[0]));
-                        if (r.getCode() == 0) {
-                            final AttrResponseVo data = r.getData("attr", new TypeReference<AttrResponseVo>() {});
-                            navVo.setNavName(data.getAttrName());
-                        }
-                        else {
-                            // 出现异常则封装ID
-                            navVo.setNavName(s[0]);
-                        }
+                        final long attrId = Long.parseLong(s[0]);
+                        result
+                                .getAttrIds()
+                                .add(attrId);
+                        navVo.setNavName(attrMap.get(attrId));
 
                         // 2、取消了这个面包屑以后，我们要跳转到哪个地方，将请求的地址url里面的当前置空
                         // 拿到所有的查询条件，去掉当前
-                        final String replace = replaceQueryString(param, attr, "attrs");
+                        final String replace = replaceQueryString(param, "attrs", attr);
                         navVo.setLink("http://search.gulimall.com/list.html?" + replace);
                         return navVo;
                     })
@@ -455,9 +454,6 @@ public class MallSearchServiceImpl implements MallSearchService
             final SearchResult.NavVo nav = new SearchResult.NavVo();
             nav.setNavName("品牌");
 
-            final Map<Long, String> brandMap = brandVoList
-                    .stream()
-                    .collect(Collectors.toMap(SearchResult.BrandVo::getBrandId, SearchResult.BrandVo::getBrandName));
             final String navValue = brandIdList
                     .stream()
                     .map(brandMap::get)
@@ -467,7 +463,7 @@ public class MallSearchServiceImpl implements MallSearchService
             final AtomicReference<String> replace = new AtomicReference<>("");
             brandIdList.forEach(brandId -> replace.set(replaceQueryString(param, "brandId", brandId.toString())));
             nav.setLink("http://search.gulimall.com/list.html?" + replace.get());
-            
+
             result
                     .getNavs()
                     .add(nav);
@@ -475,11 +471,11 @@ public class MallSearchServiceImpl implements MallSearchService
         return result;
     }
 
-    private String replaceQueryString(SearchParam param, String attr, String key) {
+    private String replaceQueryString(SearchParam param, String key, String value) {
         String encode = null;
         try {
             encode = URLEncoder
-                    .encode(attr, StandardCharsets.UTF_8.name())
+                    .encode(value, StandardCharsets.UTF_8.name())
                     .replace("%28", "(")
                     .replace("%29", ")")
                     .replace("+", "%20");
