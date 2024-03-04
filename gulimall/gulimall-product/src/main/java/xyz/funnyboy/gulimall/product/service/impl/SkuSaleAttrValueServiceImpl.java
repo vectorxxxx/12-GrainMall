@@ -9,7 +9,9 @@ import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.gulimall.product.dao.SkuSaleAttrValueDao;
 import xyz.funnyboy.gulimall.product.entity.SkuSaleAttrValueEntity;
 import xyz.funnyboy.gulimall.product.service.SkuSaleAttrValueService;
+import xyz.funnyboy.gulimall.product.vo.SkuItemSaleAttrVO;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("skuSaleAttrValueService")
@@ -21,6 +23,11 @@ public class SkuSaleAttrValueServiceImpl extends ServiceImpl<SkuSaleAttrValueDao
         IPage<SkuSaleAttrValueEntity> page = this.page(new Query<SkuSaleAttrValueEntity>().getPage(params), new QueryWrapper<SkuSaleAttrValueEntity>());
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuItemSaleAttrVO> getSaleAttrsBySpuId(Long spuId) {
+        return baseMapper.getSaleAttrsBySpuId(spuId);
     }
 
 }

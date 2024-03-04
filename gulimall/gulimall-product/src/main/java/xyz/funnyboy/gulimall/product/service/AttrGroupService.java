@@ -5,6 +5,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.product.entity.AttrGroupEntity;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupRelationVo;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupWithAttrsVo;
+import xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO;
 
 import java.util.List;
 import java.util.Map;
@@ -44,5 +45,14 @@ public interface AttrGroupService extends IService<AttrGroupEntity>
      * @return {@link List}<{@link AttrGroupWithAttrsVo}>
      */
     List<AttrGroupWithAttrsVo> getAttrGroupWithAttrsByCatelogId(Long catelogId);
+
+    /**
+     * 通过 SPU ID 获取具有 ATTR  ATTR 组
+     *
+     * @param spuId     SPU ID
+     * @param catalogId 目录 ID
+     * @return {@link List}<{@link SpuItemAttrGroupVO}>
+     */
+    List<SpuItemAttrGroupVO> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId);
 }
 

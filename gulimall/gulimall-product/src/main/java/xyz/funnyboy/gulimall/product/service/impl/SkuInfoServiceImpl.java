@@ -4,13 +4,19 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.gulimall.product.dao.SkuInfoDao;
+import xyz.funnyboy.gulimall.product.entity.SkuImagesEntity;
 import xyz.funnyboy.gulimall.product.entity.SkuInfoEntity;
-import xyz.funnyboy.gulimall.product.service.SkuInfoService;
+import xyz.funnyboy.gulimall.product.entity.SpuInfoDescEntity;
+import xyz.funnyboy.gulimall.product.service.*;
+import xyz.funnyboy.gulimall.product.vo.SkuItemSaleAttrVO;
+import xyz.funnyboy.gulimall.product.vo.SkuItemVO;
+import xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,6 +25,17 @@ import java.util.Map;
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService
 {
+    @Autowired
+    private SkuImagesService skuImagesService;
+
+    @Autowired
+    private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @Autowired
+    private SpuInfoDescService spuInfoDescService;
+
+    @Autowired
+    private AttrGroupService attrGroupService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -57,5 +74,38 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
     @Override
     public List<SkuInfoEntity> getSkuBySpuId(Long spuId) {
         return baseMapper.selectList(new LambdaQueryWrapper<SkuInfoEntity>().eq(SkuInfoEntity::getSpuId, spuId));
+    }
+
+    /**
+     * 项目
+     *
+     * @param skuId SKU ID
+     * @return {@link SkuItemVO}
+     */
+    @Override
+    public SkuItemVO item(Long skuId) {
+        SkuItemVO skuItemVO = new SkuItemVO();
+        // 1、sku基本信息 pms_sku_info
+        final SkuInfoEntity info = getById(skuId);
+        final Long spuId = info.getSpuId();
+        final Long catalogId = info.getCatalogId();
+        skuItemVO.setInfo(info);
+
+        // 2、sku图片信息 pms_sku_images
+        List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
+        skuItemVO.setImages(images);
+
+        // 3、获取 spu 的销售属性组合 pms_sku_info + pms_sku_sale_attr_value
+        List<SkuItemSaleAttrVO> saleAttrVOList = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
+        skuItemVO.setSaleAttr(saleAttrVOList);
+
+        // 4、获取 spu 的介绍 pms_spu_info_desc
+        final SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(spuId);
+        skuItemVO.setDesc(spuInfoDescEntity);
+
+        // 5、获取 spu 的规格参数信息
+        List<SpuItemAttrGroupVO> attrGroupVOList = attrGroupService.getAttrGroupWithAttrsBySpuId(spuId, catalogId);
+        skuItemVO.setGroupAttrs(attrGroupVOList);
+        return skuItemVO;
     }
 }

@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.product.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -10,6 +11,7 @@ import xyz.funnyboy.gulimall.product.dao.SkuImagesDao;
 import xyz.funnyboy.gulimall.product.entity.SkuImagesEntity;
 import xyz.funnyboy.gulimall.product.service.SkuImagesService;
 
+import java.util.List;
 import java.util.Map;
 
 @Service("skuImagesService")
@@ -21,6 +23,11 @@ public class SkuImagesServiceImpl extends ServiceImpl<SkuImagesDao, SkuImagesEnt
         IPage<SkuImagesEntity> page = this.page(new Query<SkuImagesEntity>().getPage(params), new QueryWrapper<SkuImagesEntity>());
 
         return new PageUtils(page);
+    }
+
+    @Override
+    public List<SkuImagesEntity> getImagesBySkuId(Long skuId) {
+        return baseMapper.selectList(new LambdaQueryWrapper<SkuImagesEntity>().eq(SkuImagesEntity::getSkuId, skuId));
     }
 
 }

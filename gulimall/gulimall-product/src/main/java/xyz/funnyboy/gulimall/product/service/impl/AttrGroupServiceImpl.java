@@ -19,6 +19,7 @@ import xyz.funnyboy.gulimall.product.service.AttrService;
 import xyz.funnyboy.gulimall.product.service.CategoryService;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupRelationVo;
 import xyz.funnyboy.gulimall.product.vo.AttrGroupWithAttrsVo;
+import xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO;
 
 import java.util.Arrays;
 import java.util.List;
@@ -105,5 +106,10 @@ public class AttrGroupServiceImpl extends ServiceImpl<AttrGroupDao, AttrGroupEnt
                     return attrGroupWithAttrsVo;
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SpuItemAttrGroupVO> getAttrGroupWithAttrsBySpuId(Long spuId, Long catalogId) {
+        return baseMapper.getAttrGroupWithAttrsBySpuId(spuId, catalogId);
     }
 }
