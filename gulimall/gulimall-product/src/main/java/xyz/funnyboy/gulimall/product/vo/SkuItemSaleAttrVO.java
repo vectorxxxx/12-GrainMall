@@ -2,6 +2,8 @@ package xyz.funnyboy.gulimall.product.vo;
 
 import lombok.Data;
 
+import java.util.List;
+
 /**
  * @author VectorX
  * @version V1.0
@@ -12,5 +14,5 @@ public class SkuItemSaleAttrVO
 {
     private Long attrId;
     private String attrName;
-    private String attrValues;
+    private List<AttrValueWithSkuIdVO> attrValues;
 }

@@ -15,23 +15,23 @@
     <resultMap id="spuItemAttrGroupVo" type="xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO">
         <result property="groupName" column="attr_group_name"/>
         <collection property="attrs" ofType="xyz.funnyboy.gulimall.product.vo.Attr">
+            <result property="attrId" column="attr_id"/>
             <result property="attrName" column="attr_name"/>
             <result property="attrValue" column="attr_value"/>
         </collection>
     </resultMap>
 
-    <select id="getAttrGroupWithAttrsBySpuId" resultType="xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO">
+    <select id="getAttrGroupWithAttrsBySpuId" resultMap="spuItemAttrGroupVo">
         select pav.spu_id,
-               ag.attr_group_name,
                ag.attr_group_id,
-               aar.attr_id,
-               attr.attr_name,
+               ag.attr_group_name,
+               pav.attr_id,
+               pav.attr_name,
                pav.attr_value
-        from pms_attr_group ag
-                 left join pms_attr_attrgroup_relation aar on ag.attr_group_id = aar.attr_group_id
-                 left join pms_attr attr on attr.attr_id = aar.attr_id
-                 left join pms_product_attr_value pav on pav.attr_id = attr.attr_id
-        where ag.catelog_id = #{catalogId}
-          and pav.spu_id = #{spuId}
+        from pms_product_attr_value pav
+                 left join pms_attr_attrgroup_relation aar on pav.attr_id = aar.attr_id
+                 left join pms_attr_group ag on ag.attr_group_id = aar.attr_group_id
+        where pav.spu_id = #{spuId}
+          and ag.catelog_id = #{catalogId}
     </select>
 </mapper>

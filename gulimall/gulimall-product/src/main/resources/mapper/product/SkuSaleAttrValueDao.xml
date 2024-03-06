@@ -12,14 +12,25 @@
         <result property="attrSort" column="attr_sort"/>
     </resultMap>
 
-    <select id="getSaleAttrsBySpuId" resultType="xyz.funnyboy.gulimall.product.vo.SkuItemSaleAttrVO">
-        select ssav.attr_id                           attr_id,
-               ssav.attr_name                         attr_name,
-               group_concat(distinct ssav.attr_value) attr_values
+    <resultMap id="skuItemSaleAttrVO" type="xyz.funnyboy.gulimall.product.vo.SkuItemSaleAttrVO">
+        <result property="attrId" column="attr_id"/>
+        <result property="attrName" column="attr_name"/>
+        <collection property="attrValues" ofType="xyz.funnyboy.gulimall.product.vo.AttrValueWithSkuIdVO">
+            <result property="attrValue" column="attr_value"/>
+            <result property="skuIds" column="sku_ids"/>
+        </collection>
+    </resultMap>
+
+    <select id="getSaleAttrsBySpuId" resultMap="skuItemSaleAttrVO">
+        select ssav.attr_id,
+               ssav.attr_name,
+               ssav.attr_value,
+               group_concat(distinct info.sku_id) sku_ids
         from pms_sku_info info
                  left join pms_sku_sale_attr_value ssav on ssav.sku_id = info.sku_id
-        where spu_id = #{spuId}
+        where info.spu_id = #{spuId}
         group by ssav.attr_id,
-                 ssav.attr_name
+                 ssav.attr_name,
+                 ssav.attr_value
     </select>
 </mapper>
