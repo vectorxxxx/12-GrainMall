@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_5_1_runAfterBothAsync
+public class ThreadTest_7_2_anyOf
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -43,21 +43,47 @@ public class ThreadTest_5_1_runAfterBothAsync
                     System.out.println("任务二线程开始:" + Thread
                             .currentThread()
                             .getName());
+
+                    try {
+                        Thread.sleep(3000);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     System.out.println("任务二运行结束....");
                     return "hello";
                 }, executor);
 
-        future01
-                // runAfterBothAsync，不获取结果并处理新任务
-                .runAfterBothAsync(future02, () -> {
-                    System.out.println("任务三开始...");
+        CompletableFuture<Object> future03 = CompletableFuture
+                // supplyAsync，带线程返回值
+                .supplyAsync(() -> {
+                    System.out.println("任务三线程开始:" + Thread
+                            .currentThread()
+                            .getName());
+
+                    try {
+                        Thread.sleep(2000);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println("任务三运行结束....");
+                    return "hello2";
                 }, executor);
 
+        final CompletableFuture<Object> anyOf = CompletableFuture.anyOf(future01, future02, future03);
+        anyOf.get();
+        System.out.println("返回数据：");
+
         // 任务一线程开始：pool-1-thread-1
-        // 任务一运行结束...5
         // 任务二线程开始:pool-1-thread-2
+        // 任务一运行结束...5
+        // 任务三线程开始:pool-1-thread-3
+        // 返回数据：
+        // 任务三运行结束....
         // 任务二运行结束....
-        // 任务三开始...
     }
 
 }

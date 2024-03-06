@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_5_3_thenCombineAsync
+public class ThreadTest_5_1_runAfterBothAsync
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -37,7 +37,7 @@ public class ThreadTest_5_3_thenCombineAsync
                     return i;
                 }, executor);
 
-        CompletableFuture<String> future02 = CompletableFuture
+        CompletableFuture<Object> future02 = CompletableFuture
                 // supplyAsync，带线程返回值
                 .supplyAsync(() -> {
                     System.out.println("任务二线程开始:" + Thread
@@ -47,21 +47,17 @@ public class ThreadTest_5_3_thenCombineAsync
                     return "hello";
                 }, executor);
 
-        final CompletableFuture<String> future = future01
-                // thenCombineAsync，获取结果并获得新任务结果
-                .thenCombineAsync(future02, (res1, res2) -> {
-                    System.out.println("任务一返回值:" + res1 + "，任务二返回值:" + res2);
-                    return res1 + res2;
+        future01
+                // runAfterBothAsync，不获取结果并处理新任务
+                .runAfterBothAsync(future02, () -> {
+                    System.out.println("任务三开始...");
                 }, executor);
 
-        System.out.println("返回数据:" + future.get());
-
         // 任务一线程开始：pool-1-thread-1
-        // 任务二线程开始:pool-1-thread-2
         // 任务一运行结束...5
+        // 任务二线程开始:pool-1-thread-2
         // 任务二运行结束....
-        // 任务一返回值:5，任务二返回值:hello
-        // 返回数据:5hello
+        // 任务三开始...
     }
 
 }

@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_5_2_thenAcceptBothAsync
+public class ThreadTest_7_1_allOf
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -43,21 +43,47 @@ public class ThreadTest_5_2_thenAcceptBothAsync
                     System.out.println("任务二线程开始:" + Thread
                             .currentThread()
                             .getName());
+
+                    try {
+                        Thread.sleep(3000);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
                     System.out.println("任务二运行结束....");
                     return "hello";
                 }, executor);
 
-        future01
-                // thenAcceptBothAsync，获取结果并处理新任务
-                .thenAcceptBothAsync(future02, (res1, res2) -> {
-                    System.out.println("任务一返回值:" + res1 + "，任务二返回值:" + res2);
+        CompletableFuture<Object> future03 = CompletableFuture
+                // supplyAsync，带线程返回值
+                .supplyAsync(() -> {
+                    System.out.println("任务三线程开始:" + Thread
+                            .currentThread()
+                            .getName());
+
+                    try {
+                        Thread.sleep(2000);
+                    }
+                    catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    System.out.println("任务三运行结束....");
+                    return "hello2";
                 }, executor);
+
+        final CompletableFuture<Void> allOf = CompletableFuture.allOf(future01, future02, future03);
+        allOf.get();
+        System.out.println("返回数据：");
 
         // 任务一线程开始：pool-1-thread-1
         // 任务二线程开始:pool-1-thread-2
         // 任务一运行结束...5
+        // 任务三线程开始:pool-1-thread-3
+        // 任务三运行结束....
         // 任务二运行结束....
-        // 任务一返回值:5，任务二返回值:hello
+        // 返回数据：
     }
 
 }

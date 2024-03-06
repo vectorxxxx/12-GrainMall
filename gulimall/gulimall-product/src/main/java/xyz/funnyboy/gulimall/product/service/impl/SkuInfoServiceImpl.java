@@ -21,6 +21,9 @@ import xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
 
 @Service("skuInfoService")
 public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> implements SkuInfoService
@@ -36,6 +39,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     private AttrGroupService attrGroupService;
+
+    @Autowired
+    private ThreadPoolExecutor executor;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -83,29 +89,45 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
      * @return {@link SkuItemVO}
      */
     @Override
-    public SkuItemVO item(Long skuId) {
+    public SkuItemVO item(Long skuId) throws ExecutionException, InterruptedException {
         SkuItemVO skuItemVO = new SkuItemVO();
         // 1、sku基本信息 pms_sku_info
-        final SkuInfoEntity info = getById(skuId);
-        final Long spuId = info.getSpuId();
-        final Long catalogId = info.getCatalogId();
-        skuItemVO.setInfo(info);
-
-        // 2、sku图片信息 pms_sku_images
-        List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
-        skuItemVO.setImages(images);
+        final CompletableFuture<SkuInfoEntity> infoFuture = CompletableFuture.supplyAsync(() -> {
+            final SkuInfoEntity info = getById(skuId);
+            skuItemVO.setInfo(info);
+            return info;
+        }, executor);
 
         // 3、获取 spu 的销售属性组合 pms_sku_info + pms_sku_sale_attr_value
-        List<SkuItemSaleAttrVO> saleAttrVOList = skuSaleAttrValueService.getSaleAttrsBySpuId(spuId);
-        skuItemVO.setSaleAttr(saleAttrVOList);
+        final CompletableFuture<Void> saleFuture = infoFuture.thenAcceptAsync(info -> {
+            List<SkuItemSaleAttrVO> saleAttrVOList = skuSaleAttrValueService.getSaleAttrsBySpuId(info.getSpuId());
+            skuItemVO.setSaleAttr(saleAttrVOList);
+        }, executor);
 
         // 4、获取 spu 的介绍 pms_spu_info_desc
-        final SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(spuId);
-        skuItemVO.setDesc(spuInfoDescEntity);
+        final CompletableFuture<Void> descFuture = infoFuture.thenAcceptAsync(info -> {
+            final SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(info.getSpuId());
+            skuItemVO.setDesc(spuInfoDescEntity);
+        }, executor);
 
         // 5、获取 spu 的规格参数信息
-        List<SpuItemAttrGroupVO> attrGroupVOList = attrGroupService.getAttrGroupWithAttrsBySpuId(spuId, catalogId);
-        skuItemVO.setGroupAttrs(attrGroupVOList);
+        final CompletableFuture<Void> attrFuture = infoFuture.thenAcceptAsync(info -> {
+            List<SpuItemAttrGroupVO> attrGroupVOList = attrGroupService.getAttrGroupWithAttrsBySpuId(info.getSpuId(), info.getCatalogId());
+            skuItemVO.setGroupAttrs(attrGroupVOList);
+        }, executor);
+
+        // 2、sku图片信息 pms_sku_images
+        final CompletableFuture<Void> imageFuture = CompletableFuture.runAsync(() -> {
+            List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
+            skuItemVO.setImages(images);
+        }, executor);
+
+        // 等待所有任务都完成
+        // 多任务组合,allOf等待所有任务完成。这里就不需要加infoFuture，因为依赖于它结果的saleAttrFuture等都完成了，它肯定也完成了。
+        CompletableFuture
+                .allOf(saleFuture, descFuture, attrFuture, imageFuture)
+                .get();
+        
         return skuItemVO;
     }
 }

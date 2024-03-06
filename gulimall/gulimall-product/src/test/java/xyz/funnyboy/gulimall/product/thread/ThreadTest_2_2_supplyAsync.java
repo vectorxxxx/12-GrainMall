@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_2_1_runAsync
+public class ThreadTest_2_2_supplyAsync
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -25,18 +25,23 @@ public class ThreadTest_2_1_runAsync
             // 拒绝策略
             new ThreadPoolExecutor.AbortPolicy());
 
-    public static void main(String[] args) {
-        // runAsync，不带线程返回值
-        CompletableFuture.runAsync(() -> {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
+        // supplyAsync，带线程返回值
+        final CompletableFuture<Integer> supplyAsync = CompletableFuture.supplyAsync(() -> {
             System.out.println("当前线程：" + Thread
                     .currentThread()
                     .getName());
             int i = 10 / 2;
             System.out.println("运行结果..." + i);
+            return i;
         }, executor);
+
+        final Integer integer = supplyAsync.get();
+        System.out.println("返回数据：" + integer);
 
         // 当前线程：pool-1-thread-1
         // 运行结果...5
+        // 返回数据：5
     }
 
 }

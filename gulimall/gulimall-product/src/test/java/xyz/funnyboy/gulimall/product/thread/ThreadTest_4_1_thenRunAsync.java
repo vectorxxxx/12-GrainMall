@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_4_2_thenAcceptAsync
+public class ThreadTest_4_1_thenRunAsync
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -27,23 +27,22 @@ public class ThreadTest_4_2_thenAcceptAsync
 
     public static void main(String[] args) {
         CompletableFuture
-                // supplyAsync，带线程返回值
-                .supplyAsync(() -> {
+                // runAsync，不带线程返回值
+                .runAsync(() -> {
                     System.out.println("当前线程：" + Thread
                             .currentThread()
                             .getName());
                     int i = 10 / 2;
                     System.out.println("运行结果..." + i);
-                    return i;
                 }, executor)
-                // thenAcceptAsync，继续执行，接受上一个任务的返回结果,自己执行完没有返回结果
-                .thenAcceptAsync(res -> {
-                    System.out.println("任务二启动了...拿到了上一步的结果：" + res);
+                // thenRunAsync，继续执行，不接受上一个任务的返回结果,自己执行完没有返回结果
+                .thenRunAsync(() -> {
+                    System.out.println("任务二启动了...");
                 }, executor);
 
         // 当前线程：pool-1-thread-1
         // 运行结果...5
-        // 任务二启动了...拿到了上一步的结果：5
+        // 任务二启动了...
     }
 
 }

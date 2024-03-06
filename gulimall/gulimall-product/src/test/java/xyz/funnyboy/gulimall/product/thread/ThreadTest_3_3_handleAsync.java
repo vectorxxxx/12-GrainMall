@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_3_2_exceptionally
+public class ThreadTest_3_3_handleAsync
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -37,28 +37,30 @@ public class ThreadTest_3_2_exceptionally
                     System.out.println("运行结果..." + i);
                     return i;
                 }, executor)
-                // whenCompleteAsync，感知结果和异常但不处理
-                .whenCompleteAsync((res, exception) -> {
-                    System.out.println("异步任务完成...感知到返回值为：" + res + "异常：" + exception);
-                }, executor)
-                // exceptionally，可以感知异常，并返回自定义默认值
-                .exceptionally(throwable -> {
+                // handleAsync，线程结果感知和处理（推荐）
+                .handleAsync((res, throwable) -> {
+                    if (res != null) {
+                        return res * 2;
+                    }
+                    if (throwable != null) {
+                        System.out.println("出现异常：" + throwable.getMessage());
+                        return -1;
+                    }
                     return 0;
-                });
+                }, executor);
 
         final Integer integer = supplyAsync.get();
         System.out.println("返回数据：" + integer);
 
         // 当前线程：pool-1-thread-1
         // 运行结果...5
-        // 异步任务完成...感知到返回值为：5异常：null
-        // 返回数据：5
+        // 返回数据：10
 
         // ===================================================================================================================
 
         // 当前线程：pool-1-thread-1
-        // 异步任务完成...感知到返回值为：null异常：java.util.concurrent.CompletionException: java.lang.ArithmeticException: / by zero
-        // 返回数据：0
+        // 出现异常：java.lang.ArithmeticException: / by zero
+        // 返回数据：-1
     }
 
 }

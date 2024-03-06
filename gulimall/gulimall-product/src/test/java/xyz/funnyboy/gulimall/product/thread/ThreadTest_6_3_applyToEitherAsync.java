@@ -1,4 +1,4 @@
-package xyz.funnyboyx.gulimall.search.thread;
+package xyz.funnyboy.gulimall.product.thread;
 
 import java.util.concurrent.*;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.*;
  * @version V1.0
  * @date 2024-03-01 16:30:53
  */
-public class ThreadTest_6_2_acceptEitherAsync
+public class ThreadTest_6_3_applyToEitherAsync
 {
     public static ThreadPoolExecutor executor = new ThreadPoolExecutor(
             // 核心线程数
@@ -55,18 +55,22 @@ public class ThreadTest_6_2_acceptEitherAsync
                     return "hello";
                 }, executor);
 
-        future02
-                // acceptEitherAsync，获取结果， 新任务无返回值。
-                .acceptEitherAsync(future01, res -> {
+        final CompletableFuture<String> future = future02
+                // applyToEitherAsync，获取结果， 新任务有返回值。
+                .applyToEitherAsync(future01, res -> {
                     System.out.println("任务三线程开始:" + Thread
                             .currentThread()
                             .getName() + "拿到上次任务的结果:" + res);
+                    return res + "t3";
                 }, executor);
+
+        System.out.println("返回数据:" + future.get());
 
         // 任务一线程开始：pool-1-thread-1
         // 任务二线程开始:pool-1-thread-2
         // 任务一运行结束...5
         // 任务三线程开始:pool-1-thread-3拿到上次任务的结果:5
+        // 返回数据:5t3
         // 任务二运行结束....
     }
 

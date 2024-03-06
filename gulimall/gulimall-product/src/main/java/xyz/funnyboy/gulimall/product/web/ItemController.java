@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import xyz.funnyboy.gulimall.product.service.SkuInfoService;
 import xyz.funnyboy.gulimall.product.vo.SkuItemVO;
 
+import java.util.concurrent.ExecutionException;
+
 /**
  * @author VectorX
  * @version V1.0
@@ -24,7 +26,7 @@ public class ItemController
     @GetMapping("/{skuId}.html")
     public String skuItem(
             @PathVariable("skuId")
-                    Long skuId, Model model) {
+                    Long skuId, Model model) throws ExecutionException, InterruptedException {
         System.out.println("准备查询：" + skuId + "的详情");
         SkuItemVO skuItemVO = skuInfoService.item(skuId);
         model.addAttribute("item", skuItemVO);

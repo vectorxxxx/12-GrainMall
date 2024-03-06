@@ -52,3 +52,11 @@ logging:
   level:
     xyz.funnyboy.gulimall.product: debug
 #    xyz.funnyboy.gulimall.product: error # 性能压测用
+
+
+# 异步编排优化
+gulimall:
+  thread:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10
