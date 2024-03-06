@@ -8,6 +8,16 @@ spring:
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    # 短信服务
+    alicloud:
+      sms:
+        host: https://gyytz.market.alicloudapi.com
+        path: /sms/smsSend
+        method: POST
+        appcode: fd46d8b685624390baf9a0a37456269e
+        minute: 5
+        smsSignId: 2e65b1bb3d054466b82f0c9d125465e2
+        template-id: 908e94ccf08b4476ba6c876d13f084ad
 
 logging:
   level:

@@ -8,7 +8,10 @@
         <groupId>xyz.funnyboy.gulimall</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>gulimall-third-party</artifactId>
+    <artifactId>gulimall-auth-server</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>gulimall-product</name>
+    <description>谷粒商城-认证服务</description>
 
     <dependencies>
         <dependency>
@@ -27,6 +30,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- Thymeleaf -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-thymeleaf</artifactId>
         </dependency>
 
         <!-- 单元测试 -->
@@ -49,18 +58,20 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- 阿里云OSS -->
+        <!-- SMS -->
         <dependency>
-            <groupId>com.alibaba.cloud</groupId>
-            <artifactId>spring-cloud-starter-alicloud-oss</artifactId>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-util</artifactId>
+            <version>9.3.7.v20160115</version>
         </dependency>
 
-        <!-- 自定义配置有提示 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
     </dependencies>
-
 </project>

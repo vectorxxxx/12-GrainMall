@@ -4,9 +4,11 @@ import com.aliyun.oss.OSS;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import xyz.funnyboy.gulimall.thirdparty.component.SmsComponent;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Random;
 
 /**
  * @author VectorX
@@ -18,6 +20,19 @@ public class GulimallThirdPartyApplicationTests
 {
     @Autowired
     private OSS ossClient;
+
+    @Autowired
+    private SmsComponent smsComponent;
+
+    @Test
+    public void testSendSms() {
+        StringBuilder code = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            code.append(new Random().nextInt(10));
+        }
+        System.out.println(code);
+        smsComponent.sendSmsCode("18913212404", code.toString());
+    }
 
     @Test
     public void testUpload() throws FileNotFoundException {
