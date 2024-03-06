@@ -2,11 +2,15 @@ package xyz.funnyboy.gulimall.member.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import xyz.funnyboy.common.exception.BizCodeEnum;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.member.entity.MemberEntity;
+import xyz.funnyboy.gulimall.member.exception.PhoneExistException;
+import xyz.funnyboy.gulimall.member.exception.UsernameExistException;
 import xyz.funnyboy.gulimall.member.feign.CouponFeignService;
 import xyz.funnyboy.gulimall.member.service.MemberService;
+import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -27,6 +31,22 @@ public class MemberController
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @PostMapping("/register")
+    public R register(
+            @RequestBody
+                    MemberRegistVO vo) {
+        try {
+            memberService.register(vo);
+        }
+        catch (UsernameExistException e) {
+            return R.error(BizCodeEnum.USER_EXIST_EXCEPTION.getCode(), BizCodeEnum.USER_EXIST_EXCEPTION.getMsg());
+        }
+        catch (PhoneExistException e) {
+            return R.error(BizCodeEnum.PHONE_EXIST_EXCEPTION.getCode(), BizCodeEnum.PHONE_EXIST_EXCEPTION.getMsg());
+        }
+        return R.ok();
+    }
 
     @RequestMapping("/coupons")
     public R test() {
