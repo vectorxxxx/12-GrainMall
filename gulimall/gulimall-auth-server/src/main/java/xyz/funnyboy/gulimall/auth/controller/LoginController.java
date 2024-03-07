@@ -20,6 +20,7 @@ import xyz.funnyboy.gulimall.auth.feign.ThirdPartFeignService;
 import xyz.funnyboy.gulimall.auth.vo.UserLoginVO;
 import xyz.funnyboy.gulimall.auth.vo.UserRegVO;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,15 @@ public class LoginController
 
     @Autowired
     private MemberFeignService memberFeignService;
+
+    @GetMapping("/login.html")
+    public String loginPage(HttpSession session) {
+        final Object attribute = session.getAttribute(AuthServerConstant.LOGIN_USER);
+        if (attribute == null) {
+            return "login";
+        }
+        return "redirect:http://gulimall.com";
+    }
 
     @PostMapping("/login")
     public String login(UserLoginVO vo, RedirectAttributes attributes) {

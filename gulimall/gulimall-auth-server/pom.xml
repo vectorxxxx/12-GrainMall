@@ -75,6 +75,12 @@
             <artifactId>spring-boot-starter-data-redis</artifactId>
         </dependency>
 
+        <!-- Spring Session -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
         <!-- 作用是给yml配置加提示，不导入也行 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

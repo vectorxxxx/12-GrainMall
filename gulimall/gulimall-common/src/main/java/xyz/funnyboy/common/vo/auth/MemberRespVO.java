@@ -1,8 +1,9 @@
-package xyz.funnyboy.gulimall.auth.vo;
+package xyz.funnyboy.common.vo.auth;
 
 import lombok.Data;
 import lombok.ToString;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -14,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @ToString
-public class MemberRespVO
+public class MemberRespVO implements Serializable
 {
 
     /**

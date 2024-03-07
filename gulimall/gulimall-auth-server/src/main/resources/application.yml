@@ -10,9 +10,17 @@ spring:
   # redis
   redis:
     host: 192.168.56.10
+    port: 6379
+  # 使用 redis 存储 session
+  session:
+    store-type: redis
 
 server:
   port: 20000
+  # 配置session过期时间
+  servlet:
+    session:
+      timeout:30m
 
 # gitee 社交登录
 gitee:

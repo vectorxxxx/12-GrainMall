@@ -29,11 +29,14 @@ spring:
       # 过期时间设置为3600s，即1小时
       time-to-live: 3600000
       # 设置key的前缀,一般情况下不要自定统一前缀,方便分区处理
-#      key-prefix: CACHE_
+      #      key-prefix: CACHE_
       # key是否使用前缀
       use-key-prefix: true
       # 是否允许空值. 防止缓存穿透，可缓存null值
       cache-null-values: true
+  # 使用 redis 存储 session
+  session:
+    store-type: redis
 
 # Mybatis-Plus 配置
 mybatis-plus:
@@ -46,6 +49,10 @@ mybatis-plus:
 
 server:
   port: 10000
+  # 配置session过期时间
+  servlet:
+    session:
+      timeout:30m
 
 # 日志级别调整，方便查看sql
 logging:

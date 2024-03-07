@@ -65,6 +65,12 @@
             <artifactId>jedis</artifactId>
         </dependency>
 
+        <!-- Spring Session -->
+        <dependency>
+            <groupId>org.springframework.session</groupId>
+            <artifactId>spring-session-data-redis</artifactId>
+        </dependency>
+
         <!-- Redisson -->
         <dependency>
             <groupId>org.redisson</groupId>

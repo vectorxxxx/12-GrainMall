@@ -9,13 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import xyz.funnyboy.common.constant.AuthServerConstant;
 import xyz.funnyboy.common.utils.HttpUtils;
 import xyz.funnyboy.common.utils.R;
+import xyz.funnyboy.common.vo.auth.MemberRespVO;
 import xyz.funnyboy.gulimall.auth.config.GiteeOAuthConfig;
 import xyz.funnyboy.gulimall.auth.feign.MemberFeignService;
-import xyz.funnyboy.gulimall.auth.vo.MemberRespVO;
 import xyz.funnyboy.gulimall.auth.vo.SocialUser;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.HashMap;
@@ -47,7 +49,7 @@ public class Oauth2Controller
     @GetMapping("/oauth2.0/gitee/success")
     public String gitee(
             @RequestParam
-                    String code) throws IOException, URISyntaxException {
+                    String code, HttpSession session) throws IOException, URISyntaxException {
         // 根据code换取accessToken
         Map<String, String> headers1 = new HashMap<>();
         headers1.put("client_id", giteeOAuthConfig.getClientId());
@@ -90,6 +92,7 @@ public class Oauth2Controller
 
         // 登录成功
         final MemberRespVO memberRespVO = r.getData("data", new TypeReference<MemberRespVO>() {});
+        session.setAttribute(AuthServerConstant.LOGIN_USER, memberRespVO);
         log.info("memberRespVO:{}", memberRespVO);
         return giteeOAuthConfig.getSuccessPath();
     }
