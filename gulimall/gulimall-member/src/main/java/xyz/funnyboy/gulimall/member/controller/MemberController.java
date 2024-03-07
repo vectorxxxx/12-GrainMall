@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.member.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import xyz.funnyboy.common.exception.BizCodeEnum;
@@ -12,6 +13,7 @@ import xyz.funnyboy.gulimall.member.feign.CouponFeignService;
 import xyz.funnyboy.gulimall.member.service.MemberService;
 import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
+import xyz.funnyboy.gulimall.member.vo.SocialUser;
 
 import java.util.Arrays;
 import java.util.Map;
@@ -25,6 +27,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("member/member")
+@Slf4j
 public class MemberController
 {
     @Autowired
@@ -32,6 +35,20 @@ public class MemberController
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @PostMapping("/oauth2/login")
+    public R oauthLogin(
+            @RequestBody
+                    SocialUser socialUser) {
+        log.info("socialUser:{}", socialUser);
+        MemberEntity memberEntity = memberService.login(socialUser);
+        if (memberEntity != null) {
+            return R
+                    .ok()
+                    .put("data", memberEntity);
+        }
+        return R.error(BizCodeEnum.LOGINACTT_PASSWORD_ERROR.getCode(), BizCodeEnum.LOGINACTT_PASSWORD_ERROR.getMsg());
+    }
 
     @PostMapping("/login")
     public R login(

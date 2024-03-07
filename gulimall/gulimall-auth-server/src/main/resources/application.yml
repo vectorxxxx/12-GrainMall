@@ -14,3 +14,14 @@ spring:
 server:
   port: 20000
 
+# gitee 社交登录
+gitee:
+  oauth:
+    host: https://gitee.com
+    client-id: 59908830bb4e9a49f9e6850b3ad69af0b588cbbbad52401258cf52c00ea7b327
+    client-secret: f49f15371efe5f917149f9b5d923443702280731c76a11f1c616d33bbbbdbcfc
+    redirect-uri: http://auth.gulimall.com/oauth2.0/gitee/success
+    response-type: code
+    grant-type: authorization_code
+    fail-path: redirect:http://auth.gulimall.com/login.html
+    success-path: redirect:http://gulimall.com

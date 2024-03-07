@@ -17,6 +17,7 @@ import xyz.funnyboy.gulimall.member.service.MemberLevelService;
 import xyz.funnyboy.gulimall.member.service.MemberService;
 import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
+import xyz.funnyboy.gulimall.member.vo.SocialUser;
 
 import java.util.Date;
 import java.util.Map;
@@ -68,6 +69,27 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
             return null;
         }
 
+        return memberEntity;
+    }
+
+    @Override
+    public MemberEntity login(SocialUser socialUser) {
+        final Integer socialUid = socialUser.getId();
+        MemberEntity memberEntity = baseMapper.selectOne(new LambdaQueryWrapper<MemberEntity>().eq(MemberEntity::getSocialUid, socialUid));
+        if (memberEntity == null) {
+            memberEntity = new MemberEntity();
+            memberEntity.setNickname(socialUser.getName());
+            memberEntity.setCreateTime(new Date());
+            memberEntity.setSocialUid(String.valueOf(socialUid));
+            memberEntity.setAccessToken(socialUser.getAccess_token());
+            memberEntity.setExpiresIn(String.valueOf(socialUser.getExpires_in()));
+            baseMapper.insert(memberEntity);
+        }
+        else {
+            memberEntity.setAccessToken(socialUser.getAccess_token());
+            memberEntity.setExpiresIn(String.valueOf(socialUser.getExpires_in()));
+            baseMapper.updateById(memberEntity);
+        }
         return memberEntity;
     }
 

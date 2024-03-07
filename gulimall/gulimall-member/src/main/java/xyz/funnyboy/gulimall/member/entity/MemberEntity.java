@@ -2,10 +2,10 @@ package xyz.funnyboy.gulimall.member.entity;
 
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
-import lombok.Data;
 
 /**
  * 会员
@@ -92,5 +92,16 @@ public class MemberEntity implements Serializable {
 	 * 注册时间
 	 */
 	private Date createTime;
-
+	/**
+	 * 社交账号ID
+	 */
+	private String socialUid;
+	/**
+	 * 社交账号Token
+	 */
+	private String accessToken;
+	/**
+	 * 社交账号Token过期时间
+	 */
+	private String expiresIn;
 }

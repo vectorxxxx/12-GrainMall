@@ -5,6 +5,7 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.member.entity.MemberEntity;
 import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
+import xyz.funnyboy.gulimall.member.vo.SocialUser;
 
 import java.util.Map;
 
@@ -30,9 +31,17 @@ public interface MemberService extends IService<MemberEntity>
     /**
      * 登录
      *
-     * @param vo VO型
+     * @param vo 账户登录用户
      * @return {@link MemberEntity}
      */
     MemberEntity login(MemberLoginVO vo);
+
+    /**
+     * 登录
+     *
+     * @param socialUser 社交用户
+     * @return {@link MemberEntity}
+     */
+    MemberEntity login(SocialUser socialUser);
 }
 
