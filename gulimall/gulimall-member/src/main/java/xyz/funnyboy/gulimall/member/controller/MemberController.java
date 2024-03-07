@@ -10,6 +10,7 @@ import xyz.funnyboy.gulimall.member.exception.PhoneExistException;
 import xyz.funnyboy.gulimall.member.exception.UsernameExistException;
 import xyz.funnyboy.gulimall.member.feign.CouponFeignService;
 import xyz.funnyboy.gulimall.member.service.MemberService;
+import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
 
 import java.util.Arrays;
@@ -31,6 +32,17 @@ public class MemberController
 
     @Autowired
     private CouponFeignService couponFeignService;
+
+    @PostMapping("/login")
+    public R login(
+            @RequestBody
+                    MemberLoginVO vo) {
+        MemberEntity memberEntity = memberService.login(vo);
+        if (memberEntity != null) {
+            return R.ok();
+        }
+        return R.error(BizCodeEnum.LOGINACTT_PASSWORD_ERROR.getCode(), BizCodeEnum.LOGINACTT_PASSWORD_ERROR.getMsg());
+    }
 
     @PostMapping("/register")
     public R register(

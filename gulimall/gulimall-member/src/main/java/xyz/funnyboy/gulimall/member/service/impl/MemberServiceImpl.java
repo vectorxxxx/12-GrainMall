@@ -15,6 +15,7 @@ import xyz.funnyboy.gulimall.member.exception.PhoneExistException;
 import xyz.funnyboy.gulimall.member.exception.UsernameExistException;
 import xyz.funnyboy.gulimall.member.service.MemberLevelService;
 import xyz.funnyboy.gulimall.member.service.MemberService;
+import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
 
 import java.util.Date;
@@ -50,6 +51,24 @@ public class MemberServiceImpl extends ServiceImpl<MemberDao, MemberEntity> impl
         memberEntity.setCreateTime(new Date());
 
         baseMapper.insert(memberEntity);
+    }
+
+    @Override
+    public MemberEntity login(MemberLoginVO vo) {
+        final String loginacct = vo.getLoginacct();
+        final MemberEntity memberEntity = baseMapper.selectOne(new LambdaQueryWrapper<MemberEntity>()
+                .eq(MemberEntity::getUsername, loginacct)
+                .or()
+                .eq(MemberEntity::getMobile, loginacct));
+        if (memberEntity == null) {
+            return null;
+        }
+
+        if (!new BCryptPasswordEncoder().matches(vo.getPassword(), memberEntity.getPassword())) {
+            return null;
+        }
+
+        return memberEntity;
     }
 
     /**

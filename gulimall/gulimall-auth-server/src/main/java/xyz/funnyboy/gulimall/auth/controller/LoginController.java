@@ -17,6 +17,7 @@ import xyz.funnyboy.common.exception.BizCodeEnum;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.auth.feign.MemberFeignService;
 import xyz.funnyboy.gulimall.auth.feign.ThirdPartFeignService;
+import xyz.funnyboy.gulimall.auth.vo.UserLoginVO;
 import xyz.funnyboy.gulimall.auth.vo.UserRegVO;
 
 import javax.validation.Valid;
@@ -42,6 +43,19 @@ public class LoginController
 
     @Autowired
     private MemberFeignService memberFeignService;
+
+    @PostMapping("/login")
+    public String login(UserLoginVO vo, RedirectAttributes attributes) {
+        final R r = memberFeignService.login(vo);
+        if (r.getCode() != 0) {
+            Map<String, String> errors = new HashMap<>();
+            errors.put("msg", r.getData("msg", new TypeReference<String>() {}));
+            attributes.addFlashAttribute("error", errors);
+            return "redirect:http://auth.gulimall.com/login.html";
+        }
+
+        return "redirect:http://gulimall.com";
+    }
 
     @PostMapping("/register")
     public String register(@Valid UserRegVO userRegVO, BindingResult result, RedirectAttributes attributes) {

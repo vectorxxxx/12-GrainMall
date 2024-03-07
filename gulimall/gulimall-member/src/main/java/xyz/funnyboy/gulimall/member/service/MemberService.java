@@ -3,6 +3,7 @@ package xyz.funnyboy.gulimall.member.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.member.entity.MemberEntity;
+import xyz.funnyboy.gulimall.member.vo.MemberLoginVO;
 import xyz.funnyboy.gulimall.member.vo.MemberRegistVO;
 
 import java.util.Map;
@@ -25,5 +26,13 @@ public interface MemberService extends IService<MemberEntity>
      * @param memberRegistVO 会员注册员 VO
      */
     void register(MemberRegistVO memberRegistVO);
+
+    /**
+     * 登录
+     *
+     * @param vo VO型
+     * @return {@link MemberEntity}
+     */
+    MemberEntity login(MemberLoginVO vo);
 }
 
