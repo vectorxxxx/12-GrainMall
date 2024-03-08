@@ -8,6 +8,7 @@ import xyz.funnyboy.gulimall.product.entity.SkuSaleAttrValueEntity;
 import xyz.funnyboy.gulimall.product.service.SkuSaleAttrValueService;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -23,6 +24,13 @@ public class SkuSaleAttrValueController
 {
     @Autowired
     private SkuSaleAttrValueService skuSaleAttrValueService;
+
+    @GetMapping("/stringlist/{skuId}")
+    public List<String> getSkuSaleAttrValues(
+            @PathVariable("skuId")
+                    Long skuId) {
+        return skuSaleAttrValueService.getSkuSaleAttrValuesAsStringList(skuId);
+    }
 
     /**
      * 列表

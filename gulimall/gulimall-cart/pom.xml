@@ -8,22 +8,16 @@
         <groupId>xyz.funnyboy.gulimall</groupId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <artifactId>gulimall-auth-server</artifactId>
+    <artifactId>gulimall-cart</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>gulimall-auth-server</name>
-    <description>谷粒商城-认证服务</description>
+    <name>gulimall-cart</name>
+    <description>谷粒商城-购物车服务</description>
 
     <dependencies>
         <dependency>
             <groupId>xyz.funnyboy.gulimall</groupId>
             <artifactId>gulimall-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>com.baomidou</groupId>
-                    <artifactId>mybatis-plus-boot-starter</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- web -->
@@ -58,30 +52,19 @@
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
 
-        <!-- SMS -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util</artifactId>
-            <version>9.3.7.v20160115</version>
-        </dependency>
-
         <!-- Redis -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-redis</artifactId>
-        </dependency>
-
-        <!-- Spring Session -->
         <dependency>
             <groupId>org.springframework.session</groupId>
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
 
-        <!-- 作用是给yml配置加提示，不导入也行 -->
+        <!-- Spring Session -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
+        <!-- 自定义配置有提示 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
