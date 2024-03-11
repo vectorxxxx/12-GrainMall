@@ -20,6 +20,7 @@ public class GulimallSessionConfig
         final DefaultCookieSerializer serializer = new DefaultCookieSerializer();
         serializer.setDomainName("gulimall.com");
         serializer.setCookieName("GULISESSION");
+        serializer.setCookieMaxAge(60 * 60 * 24 * 7);
         return serializer;
     }
 
