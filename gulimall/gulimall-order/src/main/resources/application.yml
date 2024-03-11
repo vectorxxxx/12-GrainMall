@@ -11,6 +11,21 @@ spring:
           127.0.0.1:8848
   application:
     name: gulimall-order
+  # RabbitMQ 配置
+  rabbitmq:
+    host: 192.168.56.10
+    port: 5672
+    virtual-host: /
+    publisher-confirm-type: correlated  # 开启发送端确认
+    publisher-returns: true  # 开启发送端消息抵达队列的确认
+    template:
+      mandatory: true  # 开启后只要消息到达队列，将以异步方式优先回调return-confirm [开不开都行]
+    listener:
+      direct:
+        acknowledge-mode: manual  # 开启消费端手动确认消息
+  # thymeleaf
+  thymeleaf:
+    cache: false
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
