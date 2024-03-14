@@ -2,11 +2,13 @@ package xyz.funnyboy.gulimall.ware.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import xyz.funnyboy.common.exception.BizCodeEnum;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.ware.entity.WareSkuEntity;
 import xyz.funnyboy.gulimall.ware.service.WareSkuService;
+import xyz.funnyboy.gulimall.ware.vo.WareSkuLockVO;
 
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +27,19 @@ public class WareSkuController
 {
     @Autowired
     private WareSkuService wareSkuService;
+
+    @PostMapping("/lock/order")
+    public R orderLockStock(
+            @RequestBody
+                    WareSkuLockVO vo) {
+        try {
+            Boolean stock = wareSkuService.orderLockStock(vo);
+            return R.ok();
+        }
+        catch (Exception e) {
+            return R.error(BizCodeEnum.NOT_STOCK_EXCEPTION.getCode(), BizCodeEnum.NOT_STOCK_EXCEPTION.getMsg());
+        }
+    }
 
     @PostMapping("/hasStock")
     public R hasStock(

@@ -18,6 +18,7 @@ import xyz.funnyboy.gulimall.cart.vo.CartItem;
 import xyz.funnyboy.gulimall.cart.vo.SkuInfoTO;
 import xyz.funnyboy.gulimall.cart.vo.UserInfoTo;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -162,6 +163,28 @@ public class CartServiceImpl implements CartService
     public void deleteItem(Long skuId) {
         final BoundHashOperations<String, Object, Object> cartOps = getCartOps();
         cartOps.delete(skuId.toString());
+    }
+
+    @Override
+    public List<CartItem> getCurrentUserCartItems() {
+        final UserInfoTo userInfoTo = CartInterceptor.toThreadLocal.get();
+        if (userInfoTo.getUserId() == null) {
+            return null;
+        }
+
+        return
+                // 获取当前用户购物车
+                getCartItems(CartConstant.CART_PREFIX + userInfoTo.getUserId())
+                        .stream()
+                        // 过滤所有被选中的购物项
+                        .filter(CartItem::getCheck)
+                        // 设置价格
+                        .peek(item -> {
+                            BigDecimal price = productFeignService.getPrice(item.getSkuId());
+                            item.setPrice(price);
+                        })
+                        .collect(Collectors.toList());
+
     }
 
     private List<CartItem> getCartItems(String cartKey) {

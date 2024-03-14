@@ -1,22 +1,32 @@
 package xyz.funnyboy.gulimall.ware.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
+import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.ware.dao.WareInfoDao;
 import xyz.funnyboy.gulimall.ware.entity.WareInfoEntity;
+import xyz.funnyboy.gulimall.ware.feign.MemberFeignService;
 import xyz.funnyboy.gulimall.ware.service.WareInfoService;
+import xyz.funnyboy.gulimall.ware.vo.FareVO;
+import xyz.funnyboy.gulimall.ware.vo.MemberAddressVO;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 @Service("wareInfoService")
 public class WareInfoServiceImpl extends ServiceImpl<WareInfoDao, WareInfoEntity> implements WareInfoService
 {
+
+    @Autowired
+    private MemberFeignService memberFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -52,6 +62,28 @@ public class WareInfoServiceImpl extends ServiceImpl<WareInfoDao, WareInfoEntity
         // 分页查询
         final IPage<WareInfoEntity> page = baseMapper.selectPage(new Query<WareInfoEntity>().getPage(params), queryWrapper);
         return new PageUtils(page);
+    }
+
+    @Override
+    public FareVO getFare(Long addrId) {
+
+        final R r = memberFeignService.addrInfo(addrId);
+        final MemberAddressVO memberAddressVO = r.getData("memberReceiveAddress", new TypeReference<MemberAddressVO>() {});
+        if (memberAddressVO == null) {
+            return null;
+        }
+
+        // 简略计算运费，用手机号后前两位作为运费
+        final String fareStr = memberAddressVO
+                .getPhone()
+                .substring(0, 2);
+        final BigDecimal fare = new BigDecimal(fareStr);
+
+        // 封装运费信息
+        final FareVO fareVO = new FareVO();
+        fareVO.setAddress(memberAddressVO);
+        fareVO.setFare(fare);
+        return fareVO;
     }
 
 }

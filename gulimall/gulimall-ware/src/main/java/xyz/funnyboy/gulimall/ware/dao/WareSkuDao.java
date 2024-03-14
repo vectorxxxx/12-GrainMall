@@ -5,6 +5,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import xyz.funnyboy.gulimall.ware.entity.WareSkuEntity;
 
+import java.util.List;
+
 /**
  * 商品库存
  *
@@ -25,4 +27,30 @@ public interface WareSkuDao extends BaseMapper<WareSkuEntity>
     Long getSkuStock(
             @Param("skuId")
                     Long skuId);
+
+    /**
+     * 列出有库存的仓库ID
+     *
+     * @param skuId SKU ID
+     * @return {@link List}<{@link Long}>
+     */
+    List<Long> listWareIdHasSkuStock(
+            @Param("skuId")
+                    Long skuId);
+
+    /**
+     * 锁定商品库存
+     *
+     * @param skuId  SKU ID
+     * @param wareId Ware ID
+     * @param num    数量
+     * @return {@link Long}
+     */
+    Long lockSkuStock(
+            @Param("skuId")
+                    Long skuId,
+            @Param("wareId")
+                    Long wareId,
+            @Param("num")
+                    Integer num);
 }

@@ -6,11 +6,10 @@ import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.ware.entity.WareInfoEntity;
 import xyz.funnyboy.gulimall.ware.service.WareInfoService;
+import xyz.funnyboy.gulimall.ware.vo.FareVO;
 
 import java.util.Arrays;
 import java.util.Map;
-
-
 
 /**
  * 仓库信息
@@ -21,19 +20,34 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("ware/wareinfo")
-public class WareInfoController {
+public class WareInfoController
+{
     @Autowired
     private WareInfoService wareInfoService;
+
+    @GetMapping("/fare")
+    public R getFare(
+            @RequestParam("addrId")
+                    Long addrId) {
+        FareVO fare = wareInfoService.getFare(addrId);
+        return R
+                .ok()
+                .setData(fare);
+    }
 
     /**
      * 列表
      */
     @RequestMapping("/list")
     // @RequiresPermissions("ware:wareinfo:list")
-    public R list(@RequestParam Map<String, Object> params){
+    public R list(
+            @RequestParam
+                    Map<String, Object> params) {
         PageUtils page = wareInfoService.queryPageByCondition(params);
 
-        return R.ok().put("page", page);
+        return R
+                .ok()
+                .put("page", page);
     }
 
 

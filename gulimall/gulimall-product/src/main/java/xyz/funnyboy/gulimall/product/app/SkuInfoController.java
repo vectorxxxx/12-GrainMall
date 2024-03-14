@@ -7,6 +7,7 @@ import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.entity.SkuInfoEntity;
 import xyz.funnyboy.gulimall.product.service.SkuInfoService;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Map;
 
@@ -23,6 +24,17 @@ public class SkuInfoController
 {
     @Autowired
     private SkuInfoService skuInfoService;
+
+    @GetMapping("/{skuId}/price")
+    public BigDecimal getPrice(
+            @PathVariable("skuId")
+                    Long skuId) {
+        final SkuInfoEntity skuInfoEntity = skuInfoService.getById(skuId);
+        if (skuInfoEntity == null) {
+            return null;
+        }
+        return skuInfoEntity.getPrice();
+    }
 
     /**
      * 列表
