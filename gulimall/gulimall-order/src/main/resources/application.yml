@@ -4,6 +4,7 @@ spring:
     password: root
     url: jdbc:mysql://192.168.56.10:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
   cloud:
     nacos:
       discovery:
@@ -51,3 +52,12 @@ gulimall:
     core-size: 20
     max-size: 200
     keep-alive-time: 10
+
+# seata
+seata:
+  tx-service-group: gulimall-order-fescar-service-group
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+

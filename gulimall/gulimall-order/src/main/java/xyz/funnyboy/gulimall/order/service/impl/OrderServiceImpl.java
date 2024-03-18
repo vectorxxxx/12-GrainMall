@@ -5,11 +5,15 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
@@ -135,6 +139,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return orderConfirmVO;
     }
 
+    // 开启 Seata 全局事务
+    @GlobalTransactional
+    @Transactional
     @Override
     public OrderSubmitResponseVO submitOrder(OrderSubmitVO orderSubmitVO) {
         orderSubmitVOThreadLocal.set(orderSubmitVO);
@@ -204,6 +211,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             orderSubmitResponseVO.setCode(3);
             return orderSubmitResponseVO;
         }
+
+        // TODO 分布式事务测试
+        // int i = 10 / 0;
         // 锁定成功
         orderSubmitResponseVO.setOrderEntity(orderCreateTO.getOrder());
         return orderSubmitResponseVO;
@@ -421,4 +431,24 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderItemService.saveBatch(orderItems);
     }
 
+    @Transactional(timeout = 30)
+    public void a() {
+        // 事务是通过代理生效的，所以这里b()和c()方法的本地事务都失效
+        // b();
+        // c();
+        // 需要通过代理对象调用，本地事务就不会失效了
+        OrderServiceImpl orderService = (OrderServiceImpl) AopContext.currentProxy();
+        orderService.b();
+        orderService.c();
+    }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void b() {
+
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void c() {
+
+    }
 }

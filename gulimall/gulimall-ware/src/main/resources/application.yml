@@ -4,6 +4,7 @@ spring:
     password: root
     url: jdbc:mysql://192.168.56.10:3306/gulimall_wms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
   cloud:
     nacos:
       discovery:
@@ -11,6 +12,14 @@ spring:
           127.0.0.1:8848
   application:
     name: gulimall-ware
+  # RabbitMQ
+  rabbitmq:
+    host: 192.168.56.10
+    port: 5672
+    virtual-host: /
+    listener:
+      direct:
+        acknowledge-mode: manual
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -22,3 +31,12 @@ mybatis-plus:
 
 server:
   port: 11000
+
+# seata
+seata:
+  tx-service-group: gulimall-ware-fescar-service-group
+  registry:
+    type: nacos
+    nacos:
+      server-addr: 127.0.0.1:8848
+

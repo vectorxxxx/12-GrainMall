@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.exception.NoStockException;
@@ -88,6 +89,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                 .collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public Boolean orderLockStock(WareSkuLockVO vo) {
         // 当定库存之前先保存订单 以便后来消息撤回

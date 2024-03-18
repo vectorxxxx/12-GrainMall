@@ -20,13 +20,13 @@
 
     <select id="listWareIdHasSkuStock" resultType="java.lang.Long">
         select ware_id
-        from gulimall_wms.wms_ware_sku
+        from wms_ware_sku
         where sku_id = #{skuId}
           and stock - stock_locked > 0
     </select>
 
     <update id="lockSkuStock">
-        update gulimall_wms.wms_ware_sku
+        update wms_ware_sku
         set stock_locked = stock_locked + #{num}
         where sku_id = #{skuId}
           and ware_id = #{wareId}
