@@ -22,7 +22,7 @@
         <ul class="hd_wrap_right">
             <li class="forel">
                 <a th:if="${session.loginUser != null}">
-                    欢迎，[[${session.loginUser.nickName}]]
+                    欢迎，[[${session.loginUser.nickname}]]
                 </a>
                 <a th:if="${session.loginUser == null}"
                    href="http://auth.gulimall.com/login.html"

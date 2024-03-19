@@ -1,11 +1,11 @@
 package xyz.funnyboy.gulimall.order.service.impl;
 
 import com.alibaba.fastjson.TypeReference;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import io.seata.spring.annotation.GlobalTransactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -140,7 +140,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
     }
 
     // 开启 Seata 全局事务
-    @GlobalTransactional
+    // @GlobalTransactional
     @Transactional
     @Override
     public OrderSubmitResponseVO submitOrder(OrderSubmitVO orderSubmitVO) {
@@ -219,6 +219,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         return orderSubmitResponseVO;
     }
 
+    @Override
+    public OrderEntity getOrderByOrderSn(String orderSn) {
+        return this.getOne(new LambdaQueryWrapper<OrderEntity>().eq(OrderEntity::getOrderSn, orderSn));
+    }
+
     /**
      * 创建订单
      *
@@ -254,6 +259,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         // 订单信息
         orderEntity.setOrderSn(orderSn);
         orderEntity.setCreateTime(new Date());
+        orderEntity.setModifyTime(new Date());
         orderEntity.setCommentTime(new Date());
         orderEntity.setReceiveTime(new Date());
         orderEntity.setDeliveryTime(new Date());
@@ -280,7 +286,11 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderEntity.setReceiverName(address.getName());
 
         // 订单状态
+        orderEntity.setStatus(OrderConstant.OrderStatusEnum.CREATE_NEW.getCode());
+        // 自动确认时间
         orderEntity.setAutoConfirmDay(7);
+        // 未删除状态
+        orderEntity.setDeleteStatus(0);
 
         return orderEntity;
     }

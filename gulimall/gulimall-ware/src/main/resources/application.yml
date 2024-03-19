@@ -4,7 +4,7 @@ spring:
     password: root
     url: jdbc:mysql://192.168.56.10:3306/gulimall_wms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
-    type: com.alibaba.druid.pool.DruidDataSource
+#    type: com.alibaba.druid.pool.DruidDataSource
   cloud:
     nacos:
       discovery:
@@ -19,7 +19,9 @@ spring:
     virtual-host: /
     listener:
       direct:
-        acknowledge-mode: manual
+        acknowledge-mode: manual # 启动手动ack方式确认收到消息
+      simple:
+        acknowledge-mode: manual # 启动手动ack方式确认收到消息
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
