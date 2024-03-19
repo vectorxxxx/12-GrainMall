@@ -1,6 +1,7 @@
 package xyz.funnyboy.gulimall.ware.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import xyz.funnyboy.common.to.OrderTO;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.to.mq.StockLockedTO;
 import xyz.funnyboy.common.utils.PageUtils;
@@ -54,5 +55,12 @@ public interface WareSkuService extends IService<WareSkuEntity>
      * @param stockLockedTO 库存锁定TO
      */
     void unlockStock(StockLockedTO stockLockedTO);
+
+    /**
+     * 解锁库存
+     *
+     * @param orderTO 订单TO
+     */
+    void unlockStock(OrderTO orderTO);
 }
 

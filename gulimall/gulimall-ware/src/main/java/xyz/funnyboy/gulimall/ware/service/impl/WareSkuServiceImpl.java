@@ -11,14 +11,17 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import xyz.funnyboy.common.constant.OrderConstant;
+import xyz.funnyboy.common.constant.WareOrderTaskConstant;
 import xyz.funnyboy.common.exception.NoStockException;
+import xyz.funnyboy.common.to.OrderTO;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.to.mq.StockDetailTO;
 import xyz.funnyboy.common.to.mq.StockLockedTO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.common.utils.R;
-import xyz.funnyboy.gulimall.ware.config.MyRabbitConfig;
+import xyz.funnyboy.gulimall.ware.config.MyRabbitMQConfig;
 import xyz.funnyboy.gulimall.ware.dao.WareSkuDao;
 import xyz.funnyboy.gulimall.ware.entity.WareOrderTaskDetailEntity;
 import xyz.funnyboy.gulimall.ware.entity.WareOrderTaskEntity;
@@ -158,7 +161,7 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
                     final StockLockedTO lockedTO = new StockLockedTO();
                     lockedTO.setId(wareOrderTaskEntity.getId());
                     lockedTO.setDetailTO(detailTO);
-                    rabbitTemplate.convertAndSend(MyRabbitConfig.EXCHANGE, MyRabbitConfig.LOCKED_ROUTING_KEY, lockedTO);
+                    rabbitTemplate.convertAndSend(MyRabbitMQConfig.EXCHANGE, MyRabbitMQConfig.LOCKED_ROUTING_KEY, lockedTO);
                     break;
                 }
                 // 当前仓库锁定失败 重试下一个仓库
@@ -190,9 +193,23 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         // 订单数据返回成功
         final OrderVO orderVO = r.getData(new TypeReference<OrderVO>() {});
         // 订单不存在或者已经被取消了，才能解锁库存
-        if (orderVO == null || orderVO.getStatus() == 4) {
-            unlockStock(detailTO.getSkuId(), detailTO.getWareId(), detailTO.getSkuNum(), detailId);
+        if (orderVO == null || (int) orderVO.getStatus() == OrderConstant.OrderStatusEnum.CANCLED.getCode()) {
+            // 订单已回滚 || 订单未回滚已取消状态
+            if ((int) detailEntity.getLockStatus() == WareOrderTaskConstant.LockStatusEnum.LOCKED.getCode()) {
+                unlockStock(detailTO.getSkuId(), detailTO.getWareId(), detailTO.getSkuNum(), detailId);
+            }
         }
+    }
+
+    @Override
+    public void unlockStock(OrderTO orderTO) {
+        WareOrderTaskEntity taskEntity = wareOrderTaskService.getOrderTaskByOrderSn(orderTO.getOrderSn());
+        // 按照工作单找到所有没有解锁的库存进行解锁
+        wareOrderTaskDetailService
+                .list(new LambdaQueryWrapper<WareOrderTaskDetailEntity>()
+                        .eq(WareOrderTaskDetailEntity::getTaskId, taskEntity.getId())
+                        .eq(WareOrderTaskDetailEntity::getLockStatus, WareOrderTaskConstant.LockStatusEnum.LOCKED.getCode()))
+                .forEach(detailEntity -> unlockStock(detailEntity.getSkuId(), detailEntity.getWareId(), detailEntity.getSkuNum(), detailEntity.getId()));
     }
 
     /**
@@ -208,8 +225,8 @@ public class WareSkuServiceImpl extends ServiceImpl<WareSkuDao, WareSkuEntity> i
         baseMapper.unlockSkuStock(skuId, wareId, skuNum);
         // 更新库存工作单状态
         final WareOrderTaskDetailEntity wareOrderTaskDetailEntity = new WareOrderTaskDetailEntity();
-        wareOrderTaskDetailEntity.setWareId(detailId);
-        wareOrderTaskDetailEntity.setLockStatus(2);
+        wareOrderTaskDetailEntity.setId(detailId);
+        wareOrderTaskDetailEntity.setLockStatus(WareOrderTaskConstant.LockStatusEnum.UNLOCKED.getCode());
         wareOrderTaskDetailService.updateById(wareOrderTaskDetailEntity);
     }
 

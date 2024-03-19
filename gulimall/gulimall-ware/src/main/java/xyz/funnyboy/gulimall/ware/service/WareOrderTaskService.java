@@ -13,8 +13,17 @@ import java.util.Map;
  * @email uxiahnan@outlook.com
  * @date 2024-01-29 10:26:44
  */
-public interface WareOrderTaskService extends IService<WareOrderTaskEntity> {
+public interface WareOrderTaskService extends IService<WareOrderTaskEntity>
+{
 
     PageUtils queryPage(Map<String, Object> params);
+
+    /**
+     * 按订单 SN 获取订单任务
+     *
+     * @param orderSn 订购 SN
+     * @return {@link WareOrderTaskEntity}
+     */
+    WareOrderTaskEntity getOrderTaskByOrderSn(String orderSn);
 }
 

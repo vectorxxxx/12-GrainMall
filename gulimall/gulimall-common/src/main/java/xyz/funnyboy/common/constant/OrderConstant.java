@@ -1,4 +1,4 @@
-package xyz.funnyboy.gulimall.order.constant;
+package xyz.funnyboy.common.constant;
 
 /**
  * @author VectorX

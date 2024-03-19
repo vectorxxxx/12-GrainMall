@@ -7,8 +7,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import xyz.funnyboy.common.to.OrderTO;
 import xyz.funnyboy.common.to.mq.StockLockedTO;
-import xyz.funnyboy.gulimall.ware.config.MyRabbitConfig;
+import xyz.funnyboy.gulimall.ware.config.MyRabbitMQConfig;
 import xyz.funnyboy.gulimall.ware.service.WareSkuService;
 
 import java.io.IOException;
@@ -21,7 +22,7 @@ import java.io.IOException;
  */
 @Slf4j
 @Service
-@RabbitListener(queues = {MyRabbitConfig.RELEASE_QUEUE})
+@RabbitListener(queues = {MyRabbitMQConfig.RELEASE_QUEUE})
 public class StockReleaseListener
 {
     @Autowired
@@ -44,7 +45,28 @@ public class StockReleaseListener
         catch (Exception e) {
             log.error(e.getMessage(), e);
             // 若执行出现异常，重新放回队列中
-            channel.basicReject(deliveryTag, false);
+            channel.basicReject(deliveryTag, true);
+        }
+    }
+
+    @RabbitHandler
+    public void handleOrderCloseRelease(OrderTO orderTO, Message message, Channel channel) throws IOException {
+        System.out.println("收到订单关闭的消息......准备解锁库存......");
+        final long deliveryTag = message
+                .getMessageProperties()
+                .getDeliveryTag();
+        try {
+            wareSkuService.unlockStock(orderTO);
+            channel.basicAck(
+                    // long deliveryTag
+                    deliveryTag,
+                    // boolean multiple
+                    false);
+        }
+        catch (Exception e) {
+            log.error(e.getMessage(), e);
+            // 若执行出现异常，重新放回队列中
+            channel.basicReject(deliveryTag, true);
         }
     }
 }

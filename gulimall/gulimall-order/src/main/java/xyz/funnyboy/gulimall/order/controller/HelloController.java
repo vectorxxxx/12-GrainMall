@@ -6,7 +6,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.ResponseBody;
-import xyz.funnyboy.gulimall.order.config.MyRabbitConfig;
+import xyz.funnyboy.gulimall.order.config.MyRabbitMQConfig;
 
 import java.util.Date;
 import java.util.UUID;
@@ -27,11 +27,9 @@ public class HelloController
     public String sendMQ() {
         rabbitTemplate.convertAndSend(
                 // exchange
-                MyRabbitConfig.EXCHANGE,
+                MyRabbitMQConfig.EXCHANGE,
                 // routingKey
-                MyRabbitConfig.CREATE_ROUTING_KEY,
-                // object
-                UUID
+                MyRabbitMQConfig.CREATE_ROUTING_KEY, UUID
                         .randomUUID()
                         .toString());
         System.out.println(new Date() + "消息发送成功，当前时间");

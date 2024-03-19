@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.toolkit.IdWorker;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -18,12 +19,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
+import xyz.funnyboy.common.constant.OrderConstant;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.common.vo.auth.MemberRespVO;
-import xyz.funnyboy.gulimall.order.constant.OrderConstant;
+import xyz.funnyboy.gulimall.order.config.MyRabbitMQConfig;
 import xyz.funnyboy.gulimall.order.dao.OrderDao;
 import xyz.funnyboy.gulimall.order.entity.OrderEntity;
 import xyz.funnyboy.gulimall.order.entity.OrderItemEntity;
@@ -70,6 +72,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private OrderItemService orderItemService;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     private ThreadLocal<OrderSubmitVO> orderSubmitVOThreadLocal = new ThreadLocal<>();
 
@@ -215,13 +220,35 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         // TODO 分布式事务测试
         // int i = 10 / 0;
         // 锁定成功
-        orderSubmitResponseVO.setOrderEntity(orderCreateTO.getOrder());
+        final OrderEntity order = orderCreateTO.getOrder();
+        orderSubmitResponseVO.setOrderEntity(order);
+        // 发送 MQ 消息
+        rabbitTemplate.convertAndSend(MyRabbitMQConfig.EXCHANGE, MyRabbitMQConfig.CREATE_ROUTING_KEY, order);
         return orderSubmitResponseVO;
     }
 
     @Override
     public OrderEntity getOrderByOrderSn(String orderSn) {
         return this.getOne(new LambdaQueryWrapper<OrderEntity>().eq(OrderEntity::getOrderSn, orderSn));
+    }
+
+    @Override
+    public void closeOrder(OrderEntity entity) {
+        final OrderEntity byId = this.getById(entity.getId());
+        /**
+         * 超时未付款，订单改状态
+         */
+        if ((int) byId.getStatus() == OrderConstant.OrderStatusEnum.CREATE_NEW.getCode()) {
+            final OrderEntity orderEntity = new OrderEntity();
+            orderEntity.setId(entity.getId());
+            orderEntity.setStatus(OrderConstant.OrderStatusEnum.CANCLED.getCode());
+            this.updateById(orderEntity);
+
+            /**
+             * 告诉库存服务订单关闭，库存解锁
+             */
+            rabbitTemplate.convertAndSend(MyRabbitMQConfig.EXCHANGE, MyRabbitMQConfig.RELEASE_OTHER_ROUTING_KEY, orderEntity);
+        }
     }
 
     /**
@@ -259,7 +286,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         // 订单信息
         orderEntity.setOrderSn(orderSn);
         orderEntity.setCreateTime(new Date());
-        orderEntity.setModifyTime(new Date());
         orderEntity.setCommentTime(new Date());
         orderEntity.setReceiveTime(new Date());
         orderEntity.setDeliveryTime(new Date());
@@ -285,8 +311,6 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         orderEntity.setReceiverPhone(address.getPhone());
         orderEntity.setReceiverName(address.getName());
 
-        // 订单状态
-        orderEntity.setStatus(OrderConstant.OrderStatusEnum.CREATE_NEW.getCode());
         // 自动确认时间
         orderEntity.setAutoConfirmDay(7);
         // 未删除状态
@@ -426,6 +450,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         // 保存订单数据
         final OrderEntity orderEntity = orderCreateTO.getOrder();
         orderEntity.setModifyTime(new Date());
+        orderEntity.setStatus(OrderConstant.OrderStatusEnum.CREATE_NEW.getCode());
         this.save(orderEntity);
 
         // 保存订单项数据
