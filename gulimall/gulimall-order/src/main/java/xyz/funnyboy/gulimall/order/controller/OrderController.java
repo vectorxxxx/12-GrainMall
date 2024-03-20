@@ -10,8 +10,6 @@ import xyz.funnyboy.gulimall.order.service.OrderService;
 import java.util.Arrays;
 import java.util.Map;
 
-
-
 /**
  * 订单
  *
@@ -25,6 +23,16 @@ public class OrderController
 {
     @Autowired
     private OrderService orderService;
+
+    @PostMapping("/listWithItem")
+    public R listWithItem(
+            @RequestBody
+                    Map<String, Object> params) {
+        PageUtils page = orderService.queryPageWithItem(params);
+        return R
+                .ok()
+                .put("page", page);
+    }
 
     @GetMapping("/status/{orderSn}")
     public R getOrderStatus(
@@ -51,16 +59,19 @@ public class OrderController
                 .put("page", page);
     }
 
-
     /**
      * 信息
      */
     @RequestMapping("/info/{id}")
     // @RequiresPermissions("order:order:info")
-    public R info(@PathVariable("id") Long id){
-		OrderEntity order = orderService.getById(id);
+    public R info(
+            @PathVariable("id")
+                    Long id) {
+        OrderEntity order = orderService.getById(id);
 
-        return R.ok().put("order", order);
+        return R
+                .ok()
+                .put("order", order);
     }
 
     /**
@@ -68,8 +79,10 @@ public class OrderController
      */
     @RequestMapping("/save")
     // @RequiresPermissions("order:order:save")
-    public R save(@RequestBody OrderEntity order){
-		orderService.save(order);
+    public R save(
+            @RequestBody
+                    OrderEntity order) {
+        orderService.save(order);
 
         return R.ok();
     }
@@ -79,8 +92,10 @@ public class OrderController
      */
     @RequestMapping("/update")
     // @RequiresPermissions("order:order:update")
-    public R update(@RequestBody OrderEntity order){
-		orderService.updateById(order);
+    public R update(
+            @RequestBody
+                    OrderEntity order) {
+        orderService.updateById(order);
 
         return R.ok();
     }
@@ -90,8 +105,10 @@ public class OrderController
      */
     @RequestMapping("/delete")
     // @RequiresPermissions("order:order:delete")
-    public R delete(@RequestBody Long[] ids){
-		orderService.removeByIds(Arrays.asList(ids));
+    public R delete(
+            @RequestBody
+                    Long[] ids) {
+        orderService.removeByIds(Arrays.asList(ids));
 
         return R.ok();
     }

@@ -41,7 +41,7 @@ public class MyRabbitMQConfig
         Map<String, Object> map = new HashMap<>();
         map.put("x-dead-letter-exchange", EXCHANGE);
         map.put("x-dead-letter-routing-key", "stock.release");
-        map.put("x-message-ttl", 60000);
+        map.put("x-message-ttl", 120000);
         return new Queue(DELAY_QUEUE, true, false, false, map);
     }
 

@@ -2,8 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="xyz.funnyboy.gulimall.order.dao.OrderDao">
-
-	<!-- 可根据自己的需求，是否要使用 -->
+    <!-- 可根据自己的需求，是否要使用 -->
     <resultMap type="xyz.funnyboy.gulimall.order.entity.OrderEntity" id="orderMap">
         <result property="id" column="id"/>
         <result property="memberId" column="member_id"/>
@@ -49,5 +48,12 @@
         <result property="modifyTime" column="modify_time"/>
     </resultMap>
 
-
+    <update id="updateOrderStatus">
+        update oms_order
+        set status=#{code},
+            pay_type=#{payType},
+            modify_time=NOW(),
+            payment_time=NOW()
+        where order_sn = #{orderSn}
+    </update>
 </mapper>

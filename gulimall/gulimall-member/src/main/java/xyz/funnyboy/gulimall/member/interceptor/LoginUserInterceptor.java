@@ -1,4 +1,4 @@
-package xyz.funnyboy.gulimall.order.interceptor;
+package xyz.funnyboy.gulimall.member.interceptor;
 
 import org.springframework.stereotype.Component;
 import org.springframework.util.AntPathMatcher;
@@ -22,12 +22,9 @@ public class LoginUserInterceptor implements HandlerInterceptor
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        final String uri = request.getRequestURI();
         // 这个请求直接放行: /order/order/status/**
-        final AntPathMatcher antPathMatcher = new AntPathMatcher();
-        final boolean match = antPathMatcher.match("/order/order/status/**", uri);
-        final boolean match1 = antPathMatcher.match("/payed/notify", uri);
-        if (match || match1) {
+        final boolean match = new AntPathMatcher().match("/member/**", request.getRequestURI());
+        if (match) {
             return true;
         }
 

@@ -39,4 +39,14 @@
         where sku_id = #{skuId}
           and ware_id = #{wareId}
     </delete>
+
+    <select id="selectListHasSkuStock" resultMap="wareSkuMap">
+        select ware_id, sku_id, stock, stock_locked
+        from wms_ware_sku
+        where sku_id in
+        <foreach collection="skuIds" item="skuId" open="(" close=")" separator=",">
+            #{skuId}
+        </foreach>
+        and stock - stock_locked &gt; 0
+    </select>
 </mapper>

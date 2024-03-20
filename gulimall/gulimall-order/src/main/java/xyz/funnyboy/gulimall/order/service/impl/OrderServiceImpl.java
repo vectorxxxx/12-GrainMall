@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.aop.framework.AopContext;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -20,6 +21,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import xyz.funnyboy.common.constant.OrderConstant;
+import xyz.funnyboy.common.to.OrderTO;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
@@ -29,6 +31,7 @@ import xyz.funnyboy.gulimall.order.config.MyRabbitMQConfig;
 import xyz.funnyboy.gulimall.order.dao.OrderDao;
 import xyz.funnyboy.gulimall.order.entity.OrderEntity;
 import xyz.funnyboy.gulimall.order.entity.OrderItemEntity;
+import xyz.funnyboy.gulimall.order.entity.PaymentInfoEntity;
 import xyz.funnyboy.gulimall.order.feign.CartFeignService;
 import xyz.funnyboy.gulimall.order.feign.MemberFeignService;
 import xyz.funnyboy.gulimall.order.feign.ProductFeignService;
@@ -36,6 +39,7 @@ import xyz.funnyboy.gulimall.order.feign.WmsFeignService;
 import xyz.funnyboy.gulimall.order.interceptor.LoginUserInterceptor;
 import xyz.funnyboy.gulimall.order.service.OrderItemService;
 import xyz.funnyboy.gulimall.order.service.OrderService;
+import xyz.funnyboy.gulimall.order.service.PaymentInfoService;
 import xyz.funnyboy.gulimall.order.to.OrderCreateTO;
 import xyz.funnyboy.gulimall.order.vo.*;
 
@@ -75,6 +79,9 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private PaymentInfoService paymentInfoService;
 
     private ThreadLocal<OrderSubmitVO> orderSubmitVOThreadLocal = new ThreadLocal<>();
 
@@ -239,6 +246,7 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
          * 超时未付款，订单改状态
          */
         if ((int) byId.getStatus() == OrderConstant.OrderStatusEnum.CREATE_NEW.getCode()) {
+            log.info("超时未付款，订单改状态......");
             final OrderEntity orderEntity = new OrderEntity();
             orderEntity.setId(entity.getId());
             orderEntity.setStatus(OrderConstant.OrderStatusEnum.CANCLED.getCode());
@@ -247,7 +255,91 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
             /**
              * 告诉库存服务订单关闭，库存解锁
              */
-            rabbitTemplate.convertAndSend(MyRabbitMQConfig.EXCHANGE, MyRabbitMQConfig.RELEASE_OTHER_ROUTING_KEY, orderEntity);
+            log.info("告诉库存服务订单关闭，库存解锁......");
+            OrderTO orderTO = new OrderTO();
+            BeanUtils.copyProperties(orderEntity, orderTO);
+            rabbitTemplate.convertAndSend(MyRabbitMQConfig.EXCHANGE, MyRabbitMQConfig.RELEASE_OTHER_ROUTING_KEY, orderTO);
+        }
+        else {
+            log.info("非待付款状态，无需关闭订单......");
+        }
+    }
+
+    @Override
+    public PayVO getOrderPay(String orderSn) {
+        final OrderEntity orderEntity = this.getOrderByOrderSn(orderSn);
+        final OrderItemEntity itemEntity = orderItemService.getOne(new LambdaQueryWrapper<OrderItemEntity>().eq(OrderItemEntity::getOrderSn, orderSn));
+
+        // 封装 VO
+        final PayVO payVO = new PayVO();
+        payVO.setTotal_amount((orderEntity
+                .getPayAmount()
+                .setScale(2, BigDecimal.ROUND_UP)).toString());
+        payVO.setOut_trade_no(orderEntity.getOrderSn());
+        payVO.setSubject(itemEntity.getSkuName());
+        payVO.setBody(itemEntity.getSkuAttrsVals());
+        return payVO;
+    }
+
+    /**
+     * 订单支付完成跳转订单列表
+     *
+     * @param params 参数
+     * @return {@link PageUtils}
+     */
+    @Override
+    public PageUtils queryPageWithItem(Map<String, Object> params) {
+        // 获取登录用户
+        final MemberRespVO memberRespVO = LoginUserInterceptor.threadLocal.get();
+
+        // 查询订单
+        final IPage<OrderEntity> page = this.page(
+                // 分页条件
+                new Query<OrderEntity>().getPage(params),
+                // 查询条件
+                new LambdaQueryWrapper<OrderEntity>()
+                        .eq(OrderEntity::getMemberId, memberRespVO.getId())
+                        .orderByDesc(OrderEntity::getId));
+
+        // 查询订单项
+        final List<String> orderSnList = page
+                .getRecords()
+                .stream()
+                .map(OrderEntity::getOrderSn)
+                .collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(orderSnList)) {
+            return new PageUtils(page);
+        }
+        final Map<String, List<OrderItemEntity>> itemMap = orderItemService
+                .list(new LambdaQueryWrapper<OrderItemEntity>().in(OrderItemEntity::getOrderSn, orderSnList))
+                .stream()
+                .collect(Collectors.groupingBy(OrderItemEntity::getOrderSn));
+
+        // 遍历封装订单项
+        page
+                .getRecords()
+                .forEach(orderEntity -> orderEntity.setOrderItemEntityList(itemMap.get(orderEntity.getOrderSn())));
+
+        return new PageUtils(page);
+    }
+
+    @Override
+    public void handlePayResult(Integer orderStatus, Integer payCode, PaymentInfoEntity paymentInfoEntity) {
+        // 保存交易流水信息
+        log.info("保存交易流水信息.......");
+        paymentInfoService.save(paymentInfoEntity);
+
+        // 修改订单状态
+        if (OrderConstant.OrderStatusEnum.PAYED
+                .getCode()
+                .equals(orderStatus)) {
+            // 支付成功状态
+            log.info("修改订单支付成功状态.......");
+            String orderSn = paymentInfoEntity.getOrderSn();
+            baseMapper.updateOrderStatus(orderSn, orderStatus, payCode);
+        }
+        else {
+            log.error("未修改订单支付成功状态.......");
         }
     }
 

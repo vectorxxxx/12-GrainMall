@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import xyz.funnyboy.gulimall.order.config.MyRabbitMQConfig;
@@ -28,12 +27,9 @@ public class OrderCloseListener
     @Autowired
     private OrderService orderService;
 
-    @Autowired
-    private RabbitTemplate rabbitTemplate;
-
     @RabbitHandler
     public void listener(OrderEntity entity, Channel channel, Message message) throws IOException {
-        System.out.println("关闭订单中......");
+        log.info("检测是否需要关闭订单......");
         final long deliveryTag = message
                 .getMessageProperties()
                 .getDeliveryTag();

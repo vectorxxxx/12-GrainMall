@@ -103,5 +103,12 @@
         <!--    <groupId>com.alibaba.cloud</groupId>-->
         <!--    <artifactId>spring-cloud-starter-alibaba-seata</artifactId>-->
         <!--</dependency>-->
+
+        <!-- 支付功能 -->
+        <dependency>
+            <groupId>com.alipay.sdk</groupId>
+            <artifactId>alipay-sdk-java</artifactId>
+            <version>4.34.0.ALL</version>
+        </dependency>
     </dependencies>
 </project>
