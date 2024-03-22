@@ -23,6 +23,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import xyz.funnyboy.common.constant.OrderConstant;
 import xyz.funnyboy.common.to.OrderTO;
 import xyz.funnyboy.common.to.es.SkuHasStockVO;
+import xyz.funnyboy.common.to.seckill.SeckillOrderTO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
 import xyz.funnyboy.common.utils.R;
@@ -341,6 +342,38 @@ public class OrderServiceImpl extends ServiceImpl<OrderDao, OrderEntity> impleme
         else {
             log.error("未修改订单支付成功状态.......");
         }
+    }
+
+    @Override
+    public void createSeckillOrder(SeckillOrderTO order) {
+        // 1.创建订单
+        OrderEntity orderEntity = new OrderEntity();
+        orderEntity.setOrderSn(order.getOrderSn());
+        orderEntity.setMemberId(order.getMemberId());
+        orderEntity.setCreateTime(new Date());
+        BigDecimal totalPrice = order
+                .getSeckillPrice()
+                .multiply(BigDecimal.valueOf(order.getNum()));// 应付总额
+        orderEntity.setTotalAmount(totalPrice);// 订单总额
+        orderEntity.setPayAmount(totalPrice);// 应付总额
+        orderEntity.setStatus(OrderConstant.OrderStatusEnum.CREATE_NEW.getCode());
+        // 保存订单
+        this.save(orderEntity);
+
+        // 2.创建订单项信息
+        OrderItemEntity orderItem = new OrderItemEntity();
+        orderItem.setOrderSn(order.getOrderSn());
+        orderItem.setRealAmount(totalPrice);
+        orderItem.setSkuQuantity(order.getNum());
+        // 保存商品的spu信息
+        R r = productFeignService.getSpuInfoBySkuId(order.getSkuId());
+        SpuInfoVO spuInfo = r.getData(new TypeReference<SpuInfoVO>() {});
+        orderItem.setSpuId(spuInfo.getId());
+        orderItem.setSpuName(spuInfo.getSpuName());
+        orderItem.setSpuBrand(spuInfo.getBrandName());
+        orderItem.setCategoryId(spuInfo.getCatalogId());
+        // 保存订单项数据
+        orderItemService.save(orderItem);
     }
 
     /**

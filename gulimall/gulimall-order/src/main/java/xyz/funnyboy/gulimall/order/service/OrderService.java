@@ -1,6 +1,7 @@
 package xyz.funnyboy.gulimall.order.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import xyz.funnyboy.common.to.seckill.SeckillOrderTO;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.gulimall.order.entity.OrderEntity;
 import xyz.funnyboy.gulimall.order.entity.PaymentInfoEntity;
@@ -78,5 +79,12 @@ public interface OrderService extends IService<OrderEntity>
      * @param paymentInfoEntity 付款信息实体
      */
     void handlePayResult(Integer orderStatus, Integer payCode, PaymentInfoEntity paymentInfoEntity);
+
+    /**
+     * 创建秒杀订单
+     *
+     * @param seckillOrder 秒杀令
+     */
+    void createSeckillOrder(SeckillOrderTO seckillOrder);
 }
 

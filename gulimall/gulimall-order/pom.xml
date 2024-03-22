@@ -79,12 +79,6 @@
             <artifactId>spring-session-data-redis</artifactId>
         </dependency>
 
-        <!-- Spring Boot Actuator, 健康追踪指标 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-
         <!-- 作用是给yml配置加提示，不导入也行 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

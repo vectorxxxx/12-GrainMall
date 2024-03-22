@@ -9,6 +9,7 @@ import xyz.funnyboy.gulimall.product.service.SkuInfoService;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -49,6 +50,19 @@ public class SkuInfoController
         return R
                 .ok()
                 .put("page", page);
+    }
+
+    /**
+     * 查询商品集合
+     */
+    @PostMapping("/infos")
+    public R infos(
+            @RequestBody
+                    List<Long> skuIds) {
+        List<SkuInfoEntity> skuInfos = skuInfoService.getByIds(skuIds);
+        return R
+                .ok()
+                .setData(skuInfos);
     }
 
     /**

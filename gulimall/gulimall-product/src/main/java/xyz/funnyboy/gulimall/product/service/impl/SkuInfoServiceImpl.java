@@ -1,5 +1,6 @@
 package xyz.funnyboy.gulimall.product.service.impl;
 
+import com.alibaba.fastjson.TypeReference;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
@@ -9,11 +10,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import xyz.funnyboy.common.utils.PageUtils;
 import xyz.funnyboy.common.utils.Query;
+import xyz.funnyboy.common.utils.R;
 import xyz.funnyboy.gulimall.product.dao.SkuInfoDao;
 import xyz.funnyboy.gulimall.product.entity.SkuImagesEntity;
 import xyz.funnyboy.gulimall.product.entity.SkuInfoEntity;
 import xyz.funnyboy.gulimall.product.entity.SpuInfoDescEntity;
+import xyz.funnyboy.gulimall.product.feign.SeckillFeignService;
 import xyz.funnyboy.gulimall.product.service.*;
+import xyz.funnyboy.gulimall.product.vo.SeckillSkuVO;
 import xyz.funnyboy.gulimall.product.vo.SkuItemSaleAttrVO;
 import xyz.funnyboy.gulimall.product.vo.SkuItemVO;
 import xyz.funnyboy.gulimall.product.vo.SpuItemAttrGroupVO;
@@ -42,6 +46,9 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
 
     @Autowired
     private ThreadPoolExecutor executor;
+
+    @Autowired
+    private SeckillFeignService seckillFeignService;
 
     @Override
     public PageUtils queryPage(Map<String, Object> params) {
@@ -98,36 +105,50 @@ public class SkuInfoServiceImpl extends ServiceImpl<SkuInfoDao, SkuInfoEntity> i
             return info;
         }, executor);
 
-        // 3、获取 spu 的销售属性组合 pms_sku_info + pms_sku_sale_attr_value
+        // 2、获取 spu 的销售属性组合 pms_sku_info + pms_sku_sale_attr_value
         final CompletableFuture<Void> saleFuture = infoFuture.thenAcceptAsync(info -> {
             List<SkuItemSaleAttrVO> saleAttrVOList = skuSaleAttrValueService.getSaleAttrsBySpuId(info.getSpuId());
             skuItemVO.setSaleAttr(saleAttrVOList);
         }, executor);
 
-        // 4、获取 spu 的介绍 pms_spu_info_desc
+        // 3、获取 spu 的介绍 pms_spu_info_desc
         final CompletableFuture<Void> descFuture = infoFuture.thenAcceptAsync(info -> {
             final SpuInfoDescEntity spuInfoDescEntity = spuInfoDescService.getById(info.getSpuId());
             skuItemVO.setDesc(spuInfoDescEntity);
         }, executor);
 
-        // 5、获取 spu 的规格参数信息
+        // 4、获取 spu 的规格参数信息
         final CompletableFuture<Void> attrFuture = infoFuture.thenAcceptAsync(info -> {
             List<SpuItemAttrGroupVO> attrGroupVOList = attrGroupService.getAttrGroupWithAttrsBySpuId(info.getSpuId(), info.getCatalogId());
             skuItemVO.setGroupAttrs(attrGroupVOList);
         }, executor);
 
-        // 2、sku图片信息 pms_sku_images
+        // 5、获取 sku 图片信息 pms_sku_images
         final CompletableFuture<Void> imageFuture = CompletableFuture.runAsync(() -> {
             List<SkuImagesEntity> images = skuImagesService.getImagesBySkuId(skuId);
             skuItemVO.setImages(images);
         }, executor);
 
+        // 6、获取 sku 秒杀优惠
+        final CompletableFuture<Void> secKillFuture = CompletableFuture.runAsync(() -> {
+            final R r = seckillFeignService.getSkuSeckillInfo(skuId);
+            if (r.getCode() == 0) {
+                final SeckillSkuVO seckillSkuVO = r.getData(new TypeReference<SeckillSkuVO>() {});
+                skuItemVO.setSeckillSku(seckillSkuVO);
+            }
+        }, executor);
+
         // 等待所有任务都完成
         // 多任务组合,allOf等待所有任务完成。这里就不需要加infoFuture，因为依赖于它结果的saleAttrFuture等都完成了，它肯定也完成了。
         CompletableFuture
-                .allOf(saleFuture, descFuture, attrFuture, imageFuture)
+                .allOf(saleFuture, descFuture, attrFuture, imageFuture, secKillFuture)
                 .get();
-        
+
         return skuItemVO;
+    }
+
+    @Override
+    public List<SkuInfoEntity> getByIds(List<Long> skuIds) {
+        return baseMapper.selectList(new LambdaQueryWrapper<SkuInfoEntity>().in(SkuInfoEntity::getSkuId, skuIds));
     }
 }

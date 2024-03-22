@@ -228,7 +228,12 @@ public class SpuInfoServiceImpl extends ServiceImpl<SpuInfoDao, SpuInfoEntity> i
         final Long spuId = skuInfoService
                 .getById(skuId)
                 .getSpuId();
-        return this.getById(spuId);
+        final SpuInfoEntity spuInfo = this.getById(spuId);
+        final String brandName = brandService
+                .getById(spuInfo.getBrandId())
+                .getName();
+        spuInfo.setBrandName(brandName);
+        return spuInfo;
     }
 
     /**

@@ -511,8 +511,13 @@
 							<span>￥</span>
 							<span th:text="${#numbers.formatDecimal(item.info.price, 0, 2)}">4499.00</span>
 						</li>
-						<li>
-							预约享资格
+						<li style="color: red" th:if="${item.seckillSku != null}">
+							<span th:if="${#dates.createNow().getTime() < item.seckillSku.startTime}">
+								商品将会在 [[${#dates.format(new java.util.Date(item.seckillSku.startTime), "yyyy-MM-dd HH:mm:ss")}]] 进行秒杀
+							</span>
+							<span th:if="${#dates.createNow().getTime() >= item.seckillSku.startTime && #dates.createNow().getTime() <= item.seckillSku.endTime}">
+								秒杀价 [[${#numbers.formatDecimal(item.seckillSku.seckillPrice, 1, 2)}]]
+							</span>
 						</li>
 						<li>
 							<a href="/static/item/">
@@ -618,7 +623,7 @@
 
 				<div class="box-btns clear">
 					<div class="box-btns-one">
-						<input type="text" name="" id="numInput" value="1"/>
+						<input type="text" name="" id="productNum" value="1"/>
 						<div class="box-btns-one1">
 
 							<div>
@@ -634,9 +639,16 @@
 
 						</div>
 					</div>
-					<div class="box-btns-two">
+					<div class="box-btns-two" th:if="${item.seckillSku == null}">
 						<a id="addToCart" th:attr="skuId=${item.info.skuId}">
 							加入购物车
+						</a>
+					</div>
+					<div class="box-btns-two"
+						 th:if="${item.seckillSku != null && (#dates.createNow().getTime() >= item.seckillSku.startTime && #dates.createNow().getTime() <= item.seckillSku.endTime)}">
+						<a class="seckill" href="#"
+						   th:attr="skuId=${item.info.skuId},sessionId=${item.seckillSku.promotionSessionId},code=${item.seckillSku.randomCode}">
+							立即抢购
 						</a>
 					</div>
 					<div class="box-btns-three">
@@ -1514,6 +1526,7 @@
 <script src="/static/item/js/jquery1.9.js" type="text/javascript" charset="utf-8"></script>
 <script src="/static/item/js/js.js" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
+	<!-- 销售属性过滤 -->
 	$(".sku_attr_value").click(function () {
 		let skus = [];
 
@@ -1543,10 +1556,26 @@
 		$("a[class='sku_attr_value checked']").parent().css({'border': 'solid 1px red'});
 	}
 
+	// 加入购物车
 	$('#addToCart').click(function () {
-		let num = $('#numInput').val();
 		let skuId = $(this).attr('skuId');
+		let num = $('#productNum').val();
 		location.href = 'http://cart.gulimall.com/addToCart?skuId=' + skuId + '&num=' + num;
+		return false;
+	});
+
+	// 立即抢购
+	$(".seckill").click(function () {
+		// 未登录
+		var isLogin = [[${session.loginUser != null}]];
+		if (!isLogin) {
+			alert("秒杀请先登录");
+		}
+
+		var killId = $(this).attr("sessionId") + "_" + $(this).attr("skuId");
+		var code = $(this).attr("code");
+		var num = $("#productNum").val();
+		location.href = "http://seckill.gulimall.com/kill?killId=" + killId + "&key=" + code + "&num=" + num;
 		return false;
 	});
 </script>

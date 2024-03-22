@@ -29,9 +29,10 @@ public class SpuInfoController
     public R getSpuInfoBySkuId(
             @PathVariable("id")
                     Long skuId) {
+        final SpuInfoEntity entity = spuInfoService.getSpuInfoBySkuId(skuId);
         return R
                 .ok()
-                .setData(spuInfoService.getSpuInfoBySkuId(skuId));
+                .setData(entity);
     }
 
     /**
