@@ -1,5 +1,7 @@
 package xyz.funnyboy.gulimall.seckill.service.impl;
 
+import com.alibaba.csp.sentinel.annotation.SentinelResource;
+import com.alibaba.csp.sentinel.slots.block.BlockException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.alibaba.fastjson.TypeReference;
@@ -86,8 +88,16 @@ public class SeckillServiceImpl implements SeckillService
         saveSessionSkuInfo(sessions);
     }
 
+    public List<SeckillSkuRedisTO> blockHandler(BlockException e) {
+        log.error("getCurrentSeckillSkus()方法被限流/降级/系统保护");
+        return null;
+    }
+
+    @SentinelResource(value = "getCurrentSeckillSkusResource",
+                      blockHandler = "blockHandler")
     @Override
     public List<SeckillSkuRedisTO> getCurrentSeckillSkus() {
+        // try (final Entry entry = SphU.entry("seckillSkus")) {
         // 查询当前时间所属的秒杀场次
         final long currentTime = System.currentTimeMillis();
         // 1、查询所有秒杀场次的key => seckill:sessions:*
@@ -119,6 +129,10 @@ public class SeckillServiceImpl implements SeckillService
                 break;
             }
         }
+        // }
+        // catch (BlockException e) {
+        //     log.error("资源被限流{}" + e.getMessage());
+        // }
         return null;
     }
 

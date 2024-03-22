@@ -4,6 +4,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import xyz.funnyboy.common.utils.R;
+import xyz.funnyboy.gulimall.product.feign.fallback.SeckillFeignServiceFallBack;
 
 /**
  * @author VectorX
@@ -11,7 +12,8 @@ import xyz.funnyboy.common.utils.R;
  * @description
  * @date 2024-03-21 19:58:51
  */
-@FeignClient("gulimall-seckill")
+@FeignClient(value = "gulimall-seckill",
+             fallback = SeckillFeignServiceFallBack.class)
 public interface SeckillFeignService
 {
     @GetMapping("/sku/seckill/{skuId}")
