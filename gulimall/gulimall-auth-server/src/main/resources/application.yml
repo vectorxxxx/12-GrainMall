@@ -20,7 +20,7 @@ server:
   # 配置session过期时间
   servlet:
     session:
-      timeout:30m
+      timeout: 30m
 
 # gitee 社交登录
 gitee:
