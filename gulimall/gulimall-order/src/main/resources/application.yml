@@ -39,6 +39,15 @@ spring:
   # 日期格式
   mvc:
     date-format: yyyy-MM-dd HH:mm:ss
+  #zipkin配置
+  zipkin:
+    base-url: http://192.168.56.10:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false     # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -76,3 +85,9 @@ alipay:
   sign_type: RSA2
   charset: utf-8
   gatewayUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do
+
+# 开启debug日志（上线关掉）
+logging:
+  level:
+    org.springframework.cloud.openfeign: debug
+    org.springframework.cloud.sleuth: debug
