@@ -1,0 +1,14 @@
+spring:
+  # redis
+  redis:
+    host: redis.gulimall
+    port: 6379
+  # 使用 redis 存储 session
+  session:
+    store-type: redis
+
+server:
+  # 配置session过期时间
+  servlet:
+    session:
+      timeout: 30m

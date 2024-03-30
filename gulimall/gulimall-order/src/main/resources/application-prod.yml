@@ -1,0 +1,94 @@
+spring:
+  application:
+    name: gulimall-order
+  datasource:
+    username: root
+    password: 123456
+    url: jdbc:mysql://mysql-master.gulimall:3306/gulimall_oms?useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  cloud:
+    # nacos
+    nacos:
+      discovery:
+        server-addr: nacos-service.gulimall:8848
+    # sentinel
+    sentinel:
+      transport:
+        # 控制台地址
+        dashboard: sentinel-service.gulimall:8333
+        port: 8719
+  # RabbitMQ 配置
+  rabbitmq:
+    host: rabbitmq-management.gulimall
+    port: 5672
+    virtual-host: /
+    listener:
+      direct:
+        acknowledge-mode: manual  # 开启消费端手动确认消息
+      simple:
+        acknowledge-mode: manual  # 开启消费端手动确认消息
+  # thymeleaf
+  thymeleaf:
+    cache: true
+  # spring session
+  session:
+    store-type: redis
+  # redis
+  redis:
+    host: redis.gulimall
+    port: 6379
+  # 日期格式
+  mvc:
+    date-format: yyyy-MM-dd HH:mm:ss
+  #zipkin配置
+  zipkin:
+    base-url: http://zipkin-service.gulimall:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false     # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+server:
+  port: 8080
+
+# 异步编排优化
+gulimall:
+  thread:
+    core-size: 20
+    max-size: 200
+    keep-alive-time: 10
+
+# sentinel是不会对feign进行监控的，需要开启配置
+feign:
+  sentinel:
+    enabled: true
+
+# Spring Boot声明哪些端点是可公开的，即暴露给外部访问的。
+# 默认情况下会将所有端点都暴露出去，包括health、info等常用端点，这在生产环境中可能会存在一定的安全隐患。
+# 一般暴露health,info就行了
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+#支付宝相关的配置
+alipay:
+  app_id: 9021000132663643
+  merchant_private_key: MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQCNH3i+4g/Q4WstqcFuTOjlMgEUndM7Iqr4bn35wmhAeY5O/0oKdEpf+NoMCit9pxGUNFoEgWKmQvjsbA1Jr6NLCEGznr8YKs9t0IngWblke1QwtYQZUC7LpEDSobvBVq8YZLNo/YsobSfPw/Xdsb5+aTMZy1mXPDXjWWVcmP19kHZf3UOH4rDio8JALk+e0ML7HY84Exwgk8/Yd5KyAjMHgY21gqDghpYjojmEO7pfnfCvdoaE7lJTbAZCDonzGX3yOyCi1XyKMtjj36PJb7iMS8tSW1YCy8J/soPlqKkMD2ZOuhfme/19tOuvXrGw68tsCJ6/pyLTbcpPKp2L3TURAgMBAAECggEAQDrGtfolwKgYI9xTUWRny4kKvNtoPE33CsMfSwGUeWPZxVKj3EY5Y5zbgQdP7AySD6YUImDRCWMJ8HDtS1BJPekwHhRuXQ1/AzgayKWNn5ISK2kyCmNYKQ9FAZji34gYgT2z+mELaQblS8agrJotXVN8Eo1e5VpeHG+flpl7Jh5gAEYajvAr3UHac9hUnOVq8UfdytSPgJp9a6C6WXBELIfWGPTc1CMsiWKRNhGkg+02ME0IJx6eYCZAdi+YHRbWhGUrUlaiH/XWA+l/py5hQFRIP4DIWaja3UQWgSiKMh60JW4dvxnbdm4GEy6sspHWcf3aeyRalyPRZRhM7bu6kQKBgQDTgSZvEM9yTFJw5qSipvt5rd7whwaQ5gJWwJ9mQV6qcJdU6CHQ6XRRa76BCBNrM1sOW+qGeRn0/mL8PKoUmmzK7vnR7tTQN7/TSMan14oa82D/urZw4uqDTeQNF2Ec60CSmVjg/WVhua9WfhTVtvZ+wkx/2sbHz+GdDMyTeqVxvwKBgQCqz9TGnwMV0zRhQ64Py0oc/h+yRV6Sqx6n1SglWXGI9dZ1oOUslE2wKrtKsRHwKvnqEm3jhDxoDcKw/8vOh8AQmnKkbgVfVOMXySw/QrFTuttF6Z2eR8umEFf1Vgd1YPaYoAqSfjAGbVNNS3nal677itXLq1CQ4dlYrdcsT7FtLwKBgQCVSHYJNJNHOGmD+LdBepzK0JcnrBZNVZtXAhRAB2m64UdfDY04uF56TZMj3cBfDNt7MhNBoN5aVuck4+ikLC8XuT8pFuqsoHzLs3VL6E05IolXVsEIwpEF5odNWjAYSk/EaWobO59AL+B7Kvins8EdzSRTpeZiB+9Ve0A14/48XwKBgQCIDRIFQhJLB/booee6XMmjXiYQ8H/rgrDgLT/Uv/FWjblL5+OiJl3au66CR5dqHFECx7sPRPx4RL2WDahf0HCCyQIXRiqxTAO1pl6/5HcpoeOVRAZvU/A5TTtCBkvaimjgGFlTZX8LH3kCT+O24KpXYLX5i3KYc8uSfqSsfq1rsQKBgQCTEA4O16R+athoUiUTQvfzmfY4ShGXmAs4PcgkyWDW4w5ABa76YdZM9gdZ3a7X0M53E8ymZT0ghtB3ipGHTJlPMLLl8N9o8pF+09sjnQol/ywUv92GHnroeIJQhDyQs8tjFFYqIM8dXINA+CCjzOUyZvEYxCPdTisP9c4aQfbhEA==
+  alipay_public_key: MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp9DhAzI4LGCJuwTQ+9TQn4FOvxUgyeLHheAjejI37DYrfwuEcBND1MlRHTekv0d80FDy962w2nmw4ZhQqCP+it2qSdRt0nszaXYNaZMyx1yDB+ZdQIuPWhwwOkWz6JroGvifZNuMkPbLZmzjd1J9ySd9bAFXmwEw5rinsenC493JXluuEZLCK0ZvdcSBJjfFmJaaZgkQk7+PygTeVbJzcDqfM7NM71t9wg2YOa9vxO8NEqUD5HnM2DSuCd+TRVk1FQ7sQqADY48jskhqrtOUEG7K5KO0nzR7I8Y9HsqstV/HapFcanEqKKJi/wLNb0yzUzsNVBssTBZRxfF6nkeTTQIDAQAB
+  notify_url: http://hwx3j4.natappfree.cc/payed/notify
+  return_url: http://member.gulimall.com/memberOrder.html
+  sign_type: RSA2
+  charset: utf-8
+  gatewayUrl: https://openapi-sandbox.dl.alipaydev.com/gateway.do

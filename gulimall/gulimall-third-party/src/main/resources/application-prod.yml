@@ -1,0 +1,49 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gulimall-third-party
+  cloud:
+    nacos:
+      discovery:
+        server-addr: nacos-service.gulimall:8848
+    # sentinel
+    sentinel:
+      transport:
+        # 控制台地址
+        dashboard: sentinel-service.gulimall:8333
+        port: 8719
+    # 短信服务
+    alicloud:
+      sms:
+        host: https://gyytz.market.alicloudapi.com
+        path: /sms/smsSend
+        method: POST
+        appcode: fd46d8b685624390baf9a0a37456269e
+        minute: 5
+        smsSignId: 2e65b1bb3d054466b82f0c9d125465e2
+        template-id: 908e94ccf08b4476ba6c876d13f084ad
+  #zipkin配置
+  zipkin:
+    base-url: http://zipkin-service.gulimall:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false     # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
+
+# sentinel是不会对feign进行监控的，需要开启配置
+feign:
+  sentinel:
+    enabled: true
+
+# Spring Boot声明哪些端点是可公开的，即暴露给外部访问的。
+# 默认情况下会将所有端点都暴露出去，包括health、info等常用端点，这在生产环境中可能会存在一定的安全隐患。
+# 一般暴露health,info就行了
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

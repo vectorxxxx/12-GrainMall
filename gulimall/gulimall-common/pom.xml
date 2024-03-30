@@ -102,5 +102,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
+
+        <!-- spring cloud sleuth 链路追踪 -->
+        <!--    <dependency>-->
+        <!--      <groupId>org.springframework.cloud</groupId>-->
+        <!--      <artifactId>spring-cloud-starter-sleuth</artifactId>-->
+        <!--    </dependency>-->
+
+        <!-- zipkin依赖也同时包含了 sleuth，可以省略上边sleuth 的依赖引用 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-zipkin</artifactId>
+        </dependency>
     </dependencies>
 </project>
