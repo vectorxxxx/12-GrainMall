@@ -25,4 +25,10 @@
 - [21-分布式高级-Sentinel](./21-分布式高级-Sentinel.md)
 - [22-高可用集群-k8s](./22-高可用集群-k8s.md)
 - [23-高可用集群-kubesphere](./23-高可用集群-kubesphere.md)
+- [24-高可用集群-MySQL集群](./24-高可用集群-MySQL集群.md)
+- [25-高可用集群-Redis集群](./25-高可用集群-Redis集群.md)
+- [26-高可用集群-ElasticSearch集群](./26-高可用集群-ElasticSearch集群.md)
+- [27-高可用集群-RabbitMQ集群](./27-高可用集群-RabbitMQ集群.md)
+- [28-高可用集群-Nacos、Sentinel、Zipkin](./28-高可用集群-Nacos、Sentinel、Zipkin.md)
+- [29-高可用集群-部署](./29-高可用集群-部署.md)
 
