@@ -124,6 +124,8 @@ flush privileges;
 # master_log_file值是根据Master节点执行show master status命令后得到的结果
 change master to master_host='192.168.56.10', master_user='backup',master_password='123456',master_log_file='mysql-bin.000001',master_log_pos=0,master_port=3307;
 
+change master to master_host='mysql-master.gulimall', master_user='backup',master_password='123456',master_log_file='mysql-bin.000004',master_log_pos=0,master_port=3306;
+
 start slave;
 
 show slave status\G;

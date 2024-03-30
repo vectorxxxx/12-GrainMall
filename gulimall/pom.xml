@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>xyz.funnyboy.gulimall</groupId>
@@ -29,6 +30,10 @@
 
         <!-- spring-boot-dependencies 中定义了 elasticsearch 版本为 6.8.5，需要进行修改 -->
         <elasticsearch.version>7.4.2</elasticsearch.version>
+
+        <!-- Sonar -->
+        <sonar.jacoco.reportPaths>${PWD}/./target/jacoco.exec</sonar.jacoco.reportPaths>
+        <sonar.groovy.binaries>target/classes</sonar.groovy.binaries>
     </properties>
 
     <modules>
@@ -123,7 +128,8 @@
                 <groupId>org.elasticsearch.client</groupId>
                 <artifactId>elasticsearch-rest-high-level-client</artifactId>
                 <version>${elasticsearch.version}</version>
-                <!-- 虽然修改了 elasticsearch 版本，但是没有生效，这里直接排除下再重新指定 elasticsearch 和 elasticsearch-rest-client 的版本 -->
+                <!-- 虽然修改了 elasticsearch 版本，但是没有生效，这里直接排除下再重新指定 elasticsearch 和
+                elasticsearch-rest-client 的版本 -->
                 <exclusions>
                     <exclusion>
                         <groupId>org.elasticsearch</groupId>
@@ -153,6 +159,35 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <configuration>
+                    <append>true</append>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>agent-for-ut</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>agent-for-it</id>
+                        <goals>
+                            <goal>prepare-agent-integration</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>jacoco-site</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring-boot.version}</version>
@@ -162,6 +197,11 @@
                     <!-- 添加资源 -->
                     <addResources>true</addResources>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.6.0.1398</version>
             </plugin>
         </plugins>
     </build>
