@@ -118,7 +118,9 @@ kubectl get svc/ks-console -n kubesphere-system
 
 # 验证
 kubectl get ns
+kubectl get nodes
 kubectl get pods -n kubesphere-system
+
 
 # linux 访问
 curl -L http://10.0.2.4:30880
@@ -128,6 +130,4 @@ http://192.168.56.100:30880
 Account: admin
 Password: P@88w0rd
 ```
-
-
 
