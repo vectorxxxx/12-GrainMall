@@ -6,7 +6,20 @@
             <name>阿里云公共仓库</name>
             <url>https://maven.aliyun.com/repository/central</url>
         </mirror>
+        <mirror>
+            <id>repo1</id>
+            <mirrorOf>central</mirrorOf>
+            <name>central repo</name>
+            <url>https://repo1.maven.org/maven2/</url>
+        </mirror>
+        <mirror>
+            <id>aliyunmaven</id>
+            <mirrorOf>apache snapshots</mirrorOf>
+            <name>阿里云阿帕奇仓库</name>
+            <url>https://maven.aliyun.com/repository/apache-snapshots</url>
+        </mirror>
     </mirrors>
+
     <profiles>
         <profile>
             <id>jdk-1.8</id>
@@ -19,6 +32,28 @@
                 <maven.compiler.target>1.8</maven.compiler.target>
                 <maven.compiler.compilerVersion>1.8</maven.compiler.compilerVersion>
             </properties>
+            <repositories>
+                <repository>
+                    <id>aliyunmaven</id>
+                    <name>aliyunmaven</name>
+                    <url>https://maven.aliyun.com/repository/public</url>
+                    <layout>default</layout>
+                    <releases>
+                        <enabled>true</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </repository>
+                <repository>
+                    <id>MavenCentral</id>
+                    <url>http://repo1.maven.org/maven2/</url>
+                </repository>
+                <repository>
+                    <id>aliyunmavenApache</id>
+                    <url>https://maven.aliyun.com/repository/apache-snapshots</url>
+                </repository>
+            </repositories>
         </profile>
     </profiles>
 </settings>

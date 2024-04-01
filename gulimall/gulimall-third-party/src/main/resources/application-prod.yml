@@ -24,10 +24,15 @@ spring:
         minute: 5
         smsSignId: 2e65b1bb3d054466b82f0c9d125465e2
         template-id: 908e94ccf08b4476ba6c876d13f084ad
+      # oss
+      oss:
+        endpoint: oss-cn-shanghai.aliyuncs.com
+        bucket: gulimall-vectorx
+        access-key: LTAI5tJvtifEWV6R4Rjk7wnb
   #zipkin配置
   zipkin:
     base-url: http://zipkin-service.gulimall:9411/ # zipkin服务器地址
-    discoveryClientEnabled: false     # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    discoveryClientEnabled: false # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
     sender:
       type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
   sleuth:
@@ -46,4 +51,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
+        include: "*"

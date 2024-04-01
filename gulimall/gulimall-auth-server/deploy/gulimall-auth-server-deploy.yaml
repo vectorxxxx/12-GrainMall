@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: gulimall-auth-server
-          image: $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:$PROJECT_VERSION
+          image: $REGISTRY/$DOCKERHUB_NAMESPACE/$PROJECT_NAME:latest
           ports:
             - containerPort: 8080
               protocol: TCP
@@ -55,7 +55,8 @@ spec:
       protocol: TCP
       port: 8080
       targetPort: 8080
-      nodePort: 20001
+      # 30000-32767
+      nodePort: 31001
   selector:
     app: gulimall-auth-server
   type: NodePort
