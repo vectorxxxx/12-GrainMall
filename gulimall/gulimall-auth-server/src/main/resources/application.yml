@@ -1,8 +1,15 @@
 spring:
   cloud:
+    # nacos
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
+    # sentinel
+    sentinel:
+      transport:
+        # 控制台地址
+        dashboard: 192.168.56.10:8858
+        port: 8719
   application:
     name: gulimall-auth-server
   thymeleaf:
@@ -14,6 +21,17 @@ spring:
   # 使用 redis 存储 session
   session:
     store-type: redis
+  profiles:
+    active: dev
+  #zipkin配置
+  zipkin:
+    base-url: http://192.168.56.10:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
 
 server:
   port: 20000
@@ -22,12 +40,26 @@ server:
     session:
       timeout: 30m
 
+# sentinel是不会对feign进行监控的，需要开启配置
+feign:
+  sentinel:
+    enabled: true
+
+# Spring Boot声明哪些端点是可公开的，即暴露给外部访问的。
+# 默认情况下会将所有端点都暴露出去，包括health、info等常用端点，这在生产环境中可能会存在一定的安全隐患。
+# 一般暴露health,info就行了
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
 # gitee 社交登录
 gitee:
   oauth:
     host: https://gitee.com
     client-id: 59908830bb4e9a49f9e6850b3ad69af0b588cbbbad52401258cf52c00ea7b327
-    client-secret: f49f15371efe5f917149f9b5d923443702280731c76a11f1c616d33bbbbdbcfc
+    client-secret: 432dc8d771f199760a60fc795e4b6e98aaa38bd73bc669d8a916fddf7b63e87d
     redirect-uri: http://auth.gulimall.com/oauth2.0/gitee/success
     response-type: code
     grant-type: authorization_code

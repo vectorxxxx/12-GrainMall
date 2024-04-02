@@ -6,10 +6,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    type: com.alibaba.druid.pool.DruidDataSource
   cloud:
+    # nacos
     nacos:
       discovery:
-        server-addr:
-          127.0.0.1:8848
+        server-addr: 127.0.0.1:8848
+    # sentinel
+    sentinel:
+      transport:
+        # 控制台地址
+        dashboard: 192.168.56.10:8858
+        port: 8719
   application:
     name: gulimall-order
   # RabbitMQ 配置
@@ -48,6 +54,8 @@ spring:
   sleuth:
     sampler:
       probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
+  profiles:
+    active: dev
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -59,6 +67,20 @@ mybatis-plus:
 
 server:
   port: 9000
+
+# sentinel是不会对feign进行监控的，需要开启配置
+feign:
+  sentinel:
+    enabled: true
+
+# Spring Boot声明哪些端点是可公开的，即暴露给外部访问的。
+# 默认情况下会将所有端点都暴露出去，包括health、info等常用端点，这在生产环境中可能会存在一定的安全隐患。
+# 一般暴露health,info就行了
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 # 异步编排优化
 gulimall:

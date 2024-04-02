@@ -14,7 +14,7 @@ spring:
     sentinel:
       transport:
         # 控制台地址
-        dashboard: localhost:8080
+        dashboard: 192.168.56.10:8858
         port: 8719
   application:
     name: gulimall-product
@@ -43,6 +43,15 @@ spring:
   # 使用 redis 存储 session
   session:
     store-type: redis
+  #zipkin配置
+  zipkin:
+    base-url: http://192.168.56.10:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false     # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
 
 # Mybatis-Plus 配置
 mybatis-plus:
@@ -54,7 +63,7 @@ mybatis-plus:
       logic-not-delete-value: 0
 
 server:
-  port: 10000
+  port: 10001
   # 配置session过期时间
   servlet:
     session:

@@ -6,10 +6,16 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 #    type: com.alibaba.druid.pool.DruidDataSource
   cloud:
+    # nacos
     nacos:
       discovery:
-        server-addr:
-          127.0.0.1:8848
+        server-addr: 127.0.0.1:8848
+    # sentinel
+    sentinel:
+      transport:
+        # 控制台地址
+        dashboard: 192.168.56.10:8858
+        port: 8719
   application:
     name: gulimall-ware
   # RabbitMQ
@@ -22,6 +28,8 @@ spring:
         acknowledge-mode: manual # 启动手动ack方式确认收到消息
       simple:
         acknowledge-mode: manual # 启动手动ack方式确认收到消息
+  profiles:
+    active: dev
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml

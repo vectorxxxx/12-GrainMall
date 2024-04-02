@@ -5,6 +5,7 @@ spring:
   application:
     name: gulimall-gateway
   cloud:
+    # nacos
     nacos:
       discovery:
         server-addr: 127.0.0.1:8848
@@ -12,7 +13,7 @@ spring:
     sentinel:
       transport:
         # 控制台地址
-        dashboard: localhost:8080
+        dashboard: 192.168.56.10:8858
         port: 8719
     gateway:
       routes:
@@ -116,6 +117,20 @@ spring:
           uri: lb://gulimall-seckill
           predicates:
             - Host=seckill.gulimall.com
+  #zipkin配置
+  zipkin:
+    base-url: http://192.168.56.10:9411/ # zipkin服务器地址
+    discoveryClientEnabled: false # 关闭服务发现，否则spring cloud会把zipkin的url当做服务名称
+    sender:
+      type: web #设置使用http的方式传输数据，也可以使用RabbitMQ，Kafka
+  sleuth:
+    sampler:
+      probability: 1 # 设置抽样采集率为100%，默认为0.1，即10%
+
+# sentinel是不会对feign进行监控的，需要开启配置
+feign:
+  sentinel:
+    enabled: true
 
 # Spring Boot声明哪些端点是可公开的，即暴露给外部访问的。
 # 默认情况下会将所有端点都暴露出去，包括health、info等常用端点，这在生产环境中可能会存在一定的安全隐患。
