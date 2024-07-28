@@ -1,0 +1,21 @@
+# 谷粒商城
+192.168.56.101 gulimall.com
+# 搜索服务
+192.168.56.101 search.gulimall.com
+# 商品详情服务
+192.168.56.101 item.gulimall.com
+# 认证服务
+192.168.56.101 auth.gulimall.com
+# 购物车服务
+192.168.56.101 cart.gulimall.com
+# 订单服务
+192.168.56.101 order.gulimall.com
+# 会员服务
+192.168.56.101 member.gulimall.com
+# 秒杀服务
+192.168.56.101 seckill.gulimall.com
+# 后台服务
+192.168.56.101 admin.gulimall.com
+
+# k8s
+192.168.56.102 tomcat6.atguigu.com

@@ -1,0 +1,21 @@
+# 谷粒商城
+192.168.56.10 gulimall.com
+# 搜索服务
+192.168.56.10 search.gulimall.com
+# 商品详情服务
+192.168.56.10 item.gulimall.com
+# 认证服务
+192.168.56.10 auth.gulimall.com
+# 购物车服务
+192.168.56.10 cart.gulimall.com
+# 订单服务
+192.168.56.10 order.gulimall.com
+# 会员服务
+192.168.56.10 member.gulimall.com
+# 秒杀服务
+192.168.56.10 seckill.gulimall.com
+
+# 单点登录
+127.0.0.1 ssoserver.com
+127.0.0.1 client1.com
+127.0.0.1 client2.com
